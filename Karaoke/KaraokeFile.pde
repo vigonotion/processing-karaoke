@@ -153,6 +153,8 @@ class KaraokeFile {
     if(current != null) {
       int index = noteRows.indexOf(current);
       if(noteRows.get(index+1) != null) return noteRows.get(index+1);
+    } else if(current == null && (millis() - startTime) < 20000) {
+      if(noteRows.get(0) != null) return noteRows.get(0);
     }
     return null;
   }
