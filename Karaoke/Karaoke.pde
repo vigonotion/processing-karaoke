@@ -1,11 +1,16 @@
 import processing.video.*;
+
 Movie movie;
 KaraokeFile kFile;
 
+PFont font_OpenSans;
+
 void setup() {
-  //fullScreen();
+  //fullScreen(P2D);
   size(1920, 1080, P2D);
   //selectInput("Select a file to process:", "fileSelected");
+  
+  font_OpenSans = createFont("assets/OpenSans-Regular.ttf", 32);
   
   movie = new Movie(this, "C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.mp4");
   movie.frameRate(24);
@@ -38,17 +43,15 @@ void draw() {
   if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().getLine());
   if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().getLine());
   
+  textFont(font_OpenSans);
+  
   textSize(54);
-  text(firstLine, 100, height - 150);
+  text(firstLine, width/2 - textWidth(firstLine)/2, height - 150);
   
   textSize(36);
-  text(secondLine, 100, height - 80);
+  text(secondLine, width/2 - textWidth(secondLine)/2, height - 80);
   
 }
-
-//void movieEvent(Movie m) {
-//  m.read();
-//}
 
 void fileSelected(File selection) {
   if (selection == null) {
