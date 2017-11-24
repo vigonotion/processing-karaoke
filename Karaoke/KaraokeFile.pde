@@ -115,10 +115,7 @@ class KaraokeFile {
   }
   
   public void play() {
-    //startTime = millis();
-    
-    startTime = millis() - (long)(3.5*1000*60);
-    //currentBeat = -gap;
+    startTime = millis();
   }
   
   int lastRow = 0;
