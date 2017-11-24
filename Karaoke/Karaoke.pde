@@ -33,7 +33,8 @@ void draw() {
   image(movie, 0, 0, width, height);
   kFile.update();
   
-  
+  firstLine = "";
+  secondLine = "";
   if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().getLine());
   if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().getLine());
   

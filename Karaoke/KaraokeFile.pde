@@ -18,7 +18,7 @@ class KaraokeFile {
     
     println("there are " + lines.length + " lines");
     for (int i = 0 ; i < lines.length; i++) {
-      if(lines[i] == null) continue;
+      if(lines[i] == null || lines[i].charAt(0) == 'E') continue;
       
       if(lines[i].charAt(0) == '#') {
         
@@ -78,6 +78,9 @@ class KaraokeFile {
       
     }
     
+    noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone()));
+    noteRowElements = new ArrayList<NoteElement>();
+    
     for(NoteRow r : noteRows) {
       //println(r.getLine());
     }
@@ -112,22 +115,19 @@ class KaraokeFile {
   }
   
   public void play() {
-    startTime = millis();
+    //startTime = millis();
+    
+    startTime = millis() - (long)(3.5*1000*60);
     //currentBeat = -gap;
   }
   
   int lastRow = 0;
   
   public void update() {
-    //currentBeat = (int) (this.bpm*60) * (int)(millis() - startTime) / 1000 - gap*60;
     long elapsed = (millis() - startTime) - gap;
     
     // You have to multiply the beats by 4 because they use quarter beats
     currentBeat = (int) (((double) ((double)bpm * 4 / 60000) * (double) elapsed));
-    
-    //println(currentBeat + "|" + elapsed + " --> " + getLatestSyllable());
-    
-    if(getLatestNoteRow() != null) println(getLatestNoteRow().getLine());
     
   }
   
@@ -141,8 +141,9 @@ class KaraokeFile {
         biggest = r.getFirstBeat();
         biggestRow = r;
       }
+      
     }
-    
+        
     return biggestRow;
     
   }
@@ -153,8 +154,8 @@ class KaraokeFile {
     if(current != null) {
       int index = noteRows.indexOf(current);
       
-      /** @TODO: handle end of song (arrayindexoutofboundsexception) **/
-      if(noteRows.get(index+1) != null) return noteRows.get(index+1);
+      if(index+1 < noteRows.size() && noteRows.get(index+1) != null) return noteRows.get(index+1);
+      else return null;
       
     } else if(current == null && (millis() - startTime) < 20000) {
       if(noteRows.get(0) != null) return noteRows.get(0);
