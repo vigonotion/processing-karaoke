@@ -5,12 +5,18 @@ class KaraokeFile {
   int bpm;
   int gap;
   
+  String artist;
+  String title;
+  
   long startTime;
   int currentBeat;
   
   ArrayList<NoteRow> noteRows;
     
   public KaraokeFile(String file) {
+    
+    this.artist = "Unknown Artist";
+    this.title = "Unknown Title";
     
     String[] lines = loadStrings(file);
     noteElements = new ArrayList<NoteElement>();
@@ -30,6 +36,9 @@ class KaraokeFile {
         
         if(key.equals("#BPM")) bpm = Integer.valueOf(value);
         if(key.equals("#GAP")) gap = Integer.valueOf(value);
+        
+        if(key.equals("#ARTIST")) artist = (value);
+        if(key.equals("#TITLE")) title = (value);
       
       } else {
         String[] elements = splitCommands(lines[i]);
@@ -194,6 +203,14 @@ class KaraokeFile {
     if(biggestEl != null) return biggestEl.getSyllable();
     return "";
     
+  }
+  
+  private String getTitle() {
+    return this.title;
+  }
+  
+  private String getArtist() {
+    return this.artist;
   }
   
 }

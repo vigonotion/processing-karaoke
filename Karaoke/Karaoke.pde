@@ -5,6 +5,8 @@ KaraokeFile kFile;
 Dot dot;
 
 PFont font_OpenSans;
+PFont font_QuickSand;
+PFont font_QuickSand_Bold;
 
 void setup() {
   //fullScreen(P2D);
@@ -12,6 +14,9 @@ void setup() {
   //selectInput("Select a file to process:", "fileSelected");
   
   font_OpenSans = createFont("assets/OpenSans-Regular.ttf", 32);
+  
+  font_QuickSand = createFont("assets/Quicksand-Regular.ttf", 32);
+  font_QuickSand_Bold = createFont("assets/Quicksand-Bold.ttf", 32);
   
   movie = new Movie(this, "C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.mp4");
   movie.frameRate(24);
@@ -35,11 +40,20 @@ void draw() {
   if(movie.available()) {
     movie.read();
   }
-  
-  float ratio = 16/9;
-  
+    
   tint(50);
   image(movie, 0, 0, width, height);
+  
+  
+  textFont(font_QuickSand_Bold);
+  textSize(42);
+  text(kFile.getTitle(), 50, 90);
+  
+  textFont(font_QuickSand);
+  textSize(30);
+  text(kFile.getArtist(), 50, 130);
+  
+  
   kFile.update();
   
   firstLine = "";
