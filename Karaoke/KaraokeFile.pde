@@ -10,6 +10,7 @@ class KaraokeFile {
   
   long startTime;
   int currentBeat;
+  double currentBeatDouble;
   
   ArrayList<NoteRow> noteRows;
     
@@ -133,7 +134,8 @@ class KaraokeFile {
     long elapsed = (millis() - startTime) - gap;
     
     // You have to multiply the beats by 4 because they use quarter beats
-    currentBeat = (int) (((double) ((double)bpm * 4 / 60000) * (double) elapsed));
+    currentBeatDouble = (((double) ((double)bpm * 4 / 60000) * (double) elapsed));
+    currentBeat = (int) (currentBeatDouble);
     
   }
   
@@ -205,12 +207,16 @@ class KaraokeFile {
     
   }
   
-  private String getTitle() {
+  public String getTitle() {
     return this.title;
   }
   
-  private String getArtist() {
+  public String getArtist() {
     return this.artist;
+  }
+  
+  public ArrayList<NoteElement> getNoteElements() {
+    return this.noteElements;
   }
   
 }

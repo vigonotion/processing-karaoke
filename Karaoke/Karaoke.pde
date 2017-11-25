@@ -22,7 +22,7 @@ void setup() {
   movie.frameRate(24);
   
   
-  frameRate(24);
+  frameRate(60);
   
   kFile = new KaraokeFile("C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.txt");
   
@@ -44,7 +44,7 @@ void draw() {
   tint(50);
   image(movie, 0, 0, width, height);
   
-  
+  fill(255);
   textFont(font_QuickSand_Bold);
   textSize(42);
   text(kFile.getTitle(), 50, 90);
@@ -78,6 +78,14 @@ void draw() {
   
   
   ellipse(dot.getX(), height-220 - dot.getY(), 10, 10);
+  
+  int bubblePos = (int)( -kFile.currentBeatDouble * 20);
+  println(kFile.currentBeatDouble);
+  
+  for(NoteElement e : kFile.getNoteElements()) {
+    rect(bubblePos + e.position * 20, 500 - e.pitch * 10, e.duration * 20, 10, 10);
+
+  }
 }
 
 void fileSelected(File selection) {
