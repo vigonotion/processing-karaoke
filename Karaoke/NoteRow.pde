@@ -24,4 +24,22 @@ class NoteRow {
   public int getFirstBeat() {
     return this.firstBeat;
   }
+  
+  public int getSyllablePosition(NoteElement e) {
+    return this.noteElements.indexOf(e);
+  }
+  
+  public String getLastSyllables(NoteElement e) {
+    if(getSyllablePosition(e) < 0) return "";
+    if(!noteElements.contains(e)) return null;
+    
+    String lasts = "";
+    ArrayList<NoteElement> lastNoteElements = new ArrayList<NoteElement>(noteElements.subList(0, getSyllablePosition(e)));
+    
+    for(NoteElement el : lastNoteElements) {
+      lasts += el.getSyllable();
+    }
+    
+    return lasts;
+  }
 }

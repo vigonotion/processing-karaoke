@@ -167,7 +167,7 @@ class KaraokeFile {
     
     for(NoteElement n : noteElements) {
       int pos = n.getPosition();
-      if(pos < currentBeat && pos >= biggest)  {
+      if(pos <= currentBeat && pos > biggest)  {
         biggestEl = n;
         biggest = pos;
       }
@@ -185,7 +185,7 @@ class KaraokeFile {
     
     for(NoteElement n : noteElements) {
       int pos = n.getPosition();
-      if(pos < currentBeat && pos >= biggest)  {
+      if(pos <= currentBeat && pos > biggest)  {
         biggestEl = n;
         biggest = pos;
       }

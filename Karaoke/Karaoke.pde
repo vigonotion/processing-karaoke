@@ -2,6 +2,7 @@ import processing.video.*;
 
 Movie movie;
 KaraokeFile kFile;
+Dot dot;
 
 PFont font_OpenSans;
 
@@ -20,8 +21,11 @@ void setup() {
   
   kFile = new KaraokeFile("C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.txt");
   
+  dot = new Dot();
+  
   movie.play();
   kFile.play();
+  dot.play();
   
 }
 
@@ -48,9 +52,18 @@ void draw() {
   textSize(54);
   text(firstLine, width/2 - textWidth(firstLine)/2, height - 150);
   
+  dot.update();
+  
+  if(firstLine != "" && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null)
+    dot.setDestination((int)( width/2 - textWidth(firstLine)/2 + textWidth(kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement())) + textWidth(kFile.getLatestSyllable())/2) );
+  else
+    dot.setDestination(0);
+    
   textSize(36);
   text(secondLine, width/2 - textWidth(secondLine)/2, height - 80);
   
+  
+  ellipse(dot.getX(), height-220 - dot.getY(), 10, 10);
 }
 
 void fileSelected(File selection) {
