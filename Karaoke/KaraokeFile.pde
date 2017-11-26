@@ -81,8 +81,8 @@ class KaraokeFile {
       
       if(i.getNoteType() == NoteElement.NOTE_TYPE_LINEBREAK) {
         //println();
-
-        noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone()));
+        
+        noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone(), i.getPosition()));
         noteRowElements = new ArrayList<NoteElement>();
         
       } else {
@@ -94,7 +94,7 @@ class KaraokeFile {
       
     }
     
-    noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone()));
+    noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone(), 0));
     noteRowElements = new ArrayList<NoteElement>();
     
     for(NoteRow r : noteRows) {
@@ -161,28 +161,36 @@ class KaraokeFile {
     int cb = (!offset) ? currentBeat : (int)(((double) ((double)bpm * 4 / 60000) * (double) elapsedOffset));
     
     for(NoteRow r : noteRows) {
-      if(r.getFirstBeat() < cb && r.getFirstBeat() >= biggest) {
+      if(r.getFirstBeat() < cb && r.getFirstBeat() >= biggest && cb < r.endBeat) {
         biggest = r.getFirstBeat();
         biggestRow = r;
       }
       
     }
         
+        
     return biggestRow;
     
   }
   
   public NoteRow getNextNoteRow() {
-    NoteRow current = getLatestNoteRow();
+        
+    int biggest = -200;
+    NoteRow biggestRow = null;
     
-    if(current != null) {
-      int index = noteRows.indexOf(current);
-      
+    long elapsed = (long) (movie.time() * 1000) - gap;
+    long elapsedOffset = elapsed + Dot.TIME;
+    
+    for(NoteRow r : noteRows) {
+      if(r.getFirstBeat() < currentBeat && r.getFirstBeat() >= biggest) {
+        biggest = r.getFirstBeat();
+        biggestRow = r;
+      }
+    }
+    
+    if(biggestRow != null) {
+      int index = noteRows.indexOf(biggestRow);
       if(index+1 < noteRows.size() && noteRows.get(index+1) != null) return noteRows.get(index+1);
-      else return null;
-      
-    } else if(current == null && (millis() - startTime) < 20000) {
-      if(noteRows.get(0) != null) return noteRows.get(0);
     }
     return null;
   }

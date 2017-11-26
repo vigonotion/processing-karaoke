@@ -56,22 +56,28 @@ void draw() {
   
   firstLine = "";
   secondLine = "";
-  if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().getLine());
-  if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().getLine());
+  if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().toString());
+  if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().toString());
   
   textFont(font_OpenSans);
   
   textSize(54);
   text(firstLine, width/2 - textWidth(firstLine)/2, height - 150);
   
-  
-  if(firstLine != "" && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null) {
+  if(!firstLine.equals("")
+  && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null)
+  {
     int dest = -100;
-    dest = (int)( width/2 - textWidth(firstLine)/2 + textWidth(kFile.getLatestNoteRow(true).getLastSyllables(kFile.getLatestNoteElement(true))) + textWidth(kFile.getLatestSyllable(true))/2);
     
-    if(!kFile.getLatestNoteRow(true).getLastSyllables(kFile.getLatestNoteElement(true)).equals("-1"))
+    dest = (int)( width/2 - textWidth(firstLine)/2
+    + textWidth(kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement(true)))
+    + textWidth(kFile.getLatestSyllable(true))/2);
+    
+    if(!kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement(true)).equals("-1"))
     kFile.dot.setDestination(dest);
-  } 
+  } else {
+    kFile.dot.setX(-100);
+  }
     
   textSize(36);
   text(secondLine, width/2 - textWidth(secondLine)/2, height - 80);
@@ -84,6 +90,11 @@ void draw() {
   for(NoteElement e : kFile.getNoteElements()) {
     rect(bubblePos + e.position * kFile.bpm/8, 500 - e.pitch * 10, e.duration * kFile.bpm/8, 10, 10);
 
+  }
+  
+  if(kFile.getLatestNoteRow() != null) 
+  for(NoteElement e : kFile.getLatestNoteRow().noteElements) {
+    //println(e);
   }
 }
 

@@ -4,9 +4,14 @@ class NoteRow {
   
   String line;
   int firstBeat;
+  int endBeat;
   
-  public NoteRow(ArrayList<NoteElement> noteElements) {
+  public NoteRow(ArrayList<NoteElement> noteElements, int endBeat) {
     this.noteElements = noteElements;
+    
+    if(endBeat > 0)
+      this.endBeat = endBeat;
+    else this.endBeat = noteElements.get(noteElements.size()-1).getPosition() + noteElements.get(noteElements.size()-1).getDuration();
     
     this.line = "";
     this.firstBeat = noteElements.get(0).getPosition();
@@ -17,7 +22,8 @@ class NoteRow {
     }
   }
   
-  public String getLine() {
+  @Override
+  public String toString() {
     return this.line;
   }
   
