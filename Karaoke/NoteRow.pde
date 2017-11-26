@@ -30,7 +30,10 @@ class NoteRow {
   }
   
   public String getLastSyllables(NoteElement e) {
-    if(getSyllablePosition(e) < 0) return "";
+    
+    // When line is finished, return -1
+    if(getSyllablePosition(e) < 0) return "-1";
+    
     if(!noteElements.contains(e)) return null;
     
     String lasts = "";

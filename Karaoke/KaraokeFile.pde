@@ -12,12 +12,18 @@ class KaraokeFile {
   int currentBeat;
   double currentBeatDouble;
   
+  Movie movie;
+  Dot dot;
+  
   ArrayList<NoteRow> noteRows;
     
   public KaraokeFile(String file) {
     
     this.artist = "Unknown Artist";
     this.title = "Unknown Title";
+    
+    dot = new Dot();
+
     
     String[] lines = loadStrings(file);
     noteElements = new ArrayList<NoteElement>();
@@ -124,28 +130,38 @@ class KaraokeFile {
     
   }
   
-  public void play() {
-    startTime = millis();
+  public void play(Movie movie) {
+    //startTime = millis();
+    this.movie = movie;
   }
   
   int lastRow = 0;
   
   public void update() {
-    long elapsed = (millis() - startTime) - gap;
+    //long elapsed = (millis() - startTime) - gap;
+    long elapsed = (long) (movie.time() * 1000) - gap;
     
     // You have to multiply the beats by 4 because they use quarter beats
     currentBeatDouble = (((double) ((double)bpm * 4 / 60000) * (double) elapsed));
     currentBeat = (int) (currentBeatDouble);
     
+    dot.update();
+    
   }
   
-  public NoteRow getLatestNoteRow() {
+  public NoteRow getLatestNoteRow() { return getLatestNoteRow(false); }
+  
+  public NoteRow getLatestNoteRow(boolean offset) {
     
     int biggest = -200;
     NoteRow biggestRow = null;
     
+    long elapsed = (long) (movie.time() * 1000) - gap;
+    long elapsedOffset = elapsed + Dot.TIME;
+    int cb = (!offset) ? currentBeat : (int)(((double) ((double)bpm * 4 / 60000) * (double) elapsedOffset));
+    
     for(NoteRow r : noteRows) {
-      if(r.getFirstBeat() < currentBeat && r.getFirstBeat() >= biggest) {
+      if(r.getFirstBeat() < cb && r.getFirstBeat() >= biggest) {
         biggest = r.getFirstBeat();
         biggestRow = r;
       }
@@ -172,13 +188,21 @@ class KaraokeFile {
   }
   
   private NoteElement getLatestNoteElement() {
+    return getLatestNoteElement(false);
+  }
+  
+  private NoteElement getLatestNoteElement(boolean offset) {
     
     int biggest = -200;
     NoteElement biggestEl = null;
     
+    long elapsed = (long) (movie.time() * 1000) - gap;
+    long elapsedOffset = elapsed + Dot.TIME;
+    int cb = (!offset) ? currentBeat : (int)(((double) ((double)bpm * 4 / 60000) * (double) elapsedOffset));
+    
     for(NoteElement n : noteElements) {
       int pos = n.getPosition();
-      if(pos <= currentBeat && pos > biggest)  {
+      if(pos <= cb && pos > biggest)  {
         biggestEl = n;
         biggest = pos;
       }
@@ -189,22 +213,17 @@ class KaraokeFile {
     
   }
   
-  private String getLatestSyllable() {
+  private String getLatestSyllable(boolean offset) {
     
-    int biggest = -200;
-    NoteElement biggestEl = null;
-    
-    for(NoteElement n : noteElements) {
-      int pos = n.getPosition();
-      if(pos <= currentBeat && pos > biggest)  {
-        biggestEl = n;
-        biggest = pos;
-      }
-    }
-    
+    NoteElement biggestEl = getLatestNoteElement(offset);
+        
     if(biggestEl != null) return biggestEl.getSyllable();
     return "";
     
+  }
+  
+  private String getLatestSyllable() {
+    return getLatestSyllable(false);
   }
   
   public String getTitle() {

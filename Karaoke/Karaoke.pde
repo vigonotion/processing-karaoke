@@ -2,7 +2,6 @@ import processing.video.*;
 
 Movie movie;
 KaraokeFile kFile;
-Dot dot;
 
 PFont font_OpenSans;
 PFont font_QuickSand;
@@ -25,15 +24,11 @@ void setup() {
   frameRate(30);
   
   kFile = new KaraokeFile("C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.txt");
-  
-  dot = new Dot();
-  
-  delay(1000);
-  
+      
   movie.play();
-  kFile.play();
-  dot.play();
-  
+  kFile.play(movie);
+  kFile.dot.play();
+    
 }
 
 String firstLine = "";
@@ -41,6 +36,7 @@ String secondLine = "";
 void draw() {
   if(movie.available()) {
     movie.read();
+    
   }
     
   tint(50);
@@ -68,23 +64,25 @@ void draw() {
   textSize(54);
   text(firstLine, width/2 - textWidth(firstLine)/2, height - 150);
   
-  dot.update();
   
-  if(firstLine != "" && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null)
-    dot.setDestination((int)( width/2 - textWidth(firstLine)/2 + textWidth(kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement())) + textWidth(kFile.getLatestSyllable())/2) );
-  else
-    dot.setDestination(0);
+  if(firstLine != "" && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null) {
+    int dest = -100;
+    dest = (int)( width/2 - textWidth(firstLine)/2 + textWidth(kFile.getLatestNoteRow(true).getLastSyllables(kFile.getLatestNoteElement(true))) + textWidth(kFile.getLatestSyllable(true))/2);
+    
+    if(!kFile.getLatestNoteRow(true).getLastSyllables(kFile.getLatestNoteElement(true)).equals("-1"))
+    kFile.dot.setDestination(dest);
+  } 
     
   textSize(36);
   text(secondLine, width/2 - textWidth(secondLine)/2, height - 80);
   
   
-  ellipse(dot.getX(), height-220 - dot.getY(), 10, 10);
+  ellipse(kFile.dot.getX(), height-220 - kFile.dot.getY(), 10, 10);
   
-  int bubblePos = (int)( -kFile.currentBeatDouble * 20);
+  int bubblePos = (int)( -kFile.currentBeatDouble * kFile.bpm/8);
   
   for(NoteElement e : kFile.getNoteElements()) {
-    rect(bubblePos + e.position * 20, 500 - e.pitch * 10, e.duration * 20, 10, 10);
+    rect(bubblePos + e.position * kFile.bpm/8, 500 - e.pitch * 10, e.duration * kFile.bpm/8, 10, 10);
 
   }
 }

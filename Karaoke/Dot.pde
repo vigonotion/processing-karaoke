@@ -8,11 +8,11 @@ class Dot {
   
   
   // Settings
-  private final long TIME = 200;
-  private final int  AMP  = 30;
+  private static final long TIME = 100;
+  private static final int  AMP  = 20;
   
   public Dot() {
-    this.x = 0;
+    this.x = -100;
     this.destination = 0;
     
   }
@@ -34,7 +34,7 @@ class Dot {
       float add = constrain(((float)(millis() - startTime) / (float)TIME), 0.0, 1.0);
       this.x = (int)( lastX + difference*add );   
       
-      if(add >= 1) finished = true;
+      if(add >= 1 || difference < 0) finished = true;
       float sinParam = (float)(add) * (float)(PI);
       this.y = (int)(AMP * sin(sinParam));
     }
@@ -49,7 +49,7 @@ class Dot {
   public void setDestination(int destination) {
     
     if(destination != this.destination) {
-      finished = false;
+      finished = (this.x == -100);
       startTime = millis();
       lastX = this.x;
     }
