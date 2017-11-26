@@ -221,6 +221,14 @@ class KaraokeFile {
     
   }
   
+  private boolean singing(NoteElement e) {
+    return (currentBeatDouble > e.position && !sung(e));
+  }
+  
+  private boolean sung(NoteElement e) {
+    return (currentBeatDouble > e.position + e.duration);
+  }
+  
   private String getLatestSyllable(boolean offset) {
     
     NoteElement biggestEl = getLatestNoteElement(offset);
