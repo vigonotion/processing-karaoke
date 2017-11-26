@@ -104,11 +104,11 @@ void draw() {
     if(kFile.sung(e))
       fill(43,221,160);
     
-    rect(width/2 + bubblePos + e.position * kFile.bpm/8, 500 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
+    rect(width/2 + bubblePos + e.position * kFile.bpm/8, height/2 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
     
     if(!kFile.sung(e) && kFile.singing(e)) {
       fill(43,221,160);
-      rect(width/2, 500 - e.pitch * 15, - (float)(kFile.currentBeatDouble - e.position)* kFile.bpm/8, 15, 15);
+      rect(width/2, height/2 - e.pitch * 15, - (float)(kFile.currentBeatDouble - e.position)* kFile.bpm/8, 15, 15);
     }
 
   }
