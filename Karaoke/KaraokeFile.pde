@@ -191,8 +191,9 @@ class KaraokeFile {
     if(biggestRow != null) {
       int index = noteRows.indexOf(biggestRow);
       if(index+1 < noteRows.size() && noteRows.get(index+1) != null) return noteRows.get(index+1);
-    }
-    return null;
+      else return null;
+    } 
+    return noteRows.get(0);
   }
   
   private NoteElement getLatestNoteElement() {
