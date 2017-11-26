@@ -88,7 +88,12 @@ void draw() {
   int bubblePos = (int)( -kFile.currentBeatDouble * kFile.bpm/8);
   
   for(NoteElement e : kFile.getNoteElements()) {
-    rect(bubblePos + e.position * kFile.bpm/8, 500 - e.pitch * 10, e.duration * kFile.bpm/8, 10, 10);
+    fill(220);
+    
+    if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
+      fill(224,184,134);
+    
+    rect(bubblePos + e.position * kFile.bpm/8, 500 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
 
   }
   
