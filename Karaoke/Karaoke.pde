@@ -1,7 +1,7 @@
 private Assets assets;
 
 private ScreenSingingGame screenSingingGame;
-
+private ScreenSplashScreen screenSplash;
 
 void setup() {
   
@@ -15,14 +15,18 @@ void setup() {
   assets.init();
   
   // Create the Game Screen
-  screenSingingGame = new ScreenSingingGame(this);
-  screenSingingGame.start();
+  //screenSingingGame = new ScreenSingingGame(this);
+  //screenSingingGame.start();
+  screenSplash = new ScreenSplashScreen(this);
+  screenSplash.start();
 }
 
 
 void draw() {
-  screenSingingGame.draw();
-  image(screenSingingGame.getScreen(), 0, 0);
+  //screenSingingGame.draw();
+  //image(screenSingingGame.getScreen(), 0, 0);
+  screenSplash.draw();
+  image(screenSplash.getScreen(), 0, 0);
 }
 
 // Allow other classes to use main assets
