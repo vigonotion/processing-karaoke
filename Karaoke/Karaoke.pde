@@ -22,6 +22,7 @@ void setup() {
 
 void draw() {
   screenSingingGame.draw();
+  image(screenSingingGame.getScreen(), 0, 0);
 }
 
 // Allow other classes to use main assets

@@ -1,12 +1,12 @@
 public abstract class Screen {
   
-  PImage canvas;
+  PGraphics canvas;
   Karaoke karaoke;
   
   boolean isRunning;
   
   public Screen(Karaoke karaoke) {
-    this.canvas = new PImage(width, height);
+    this.canvas = createGraphics(width, height, P2D);
     this.karaoke = karaoke;
     this.isRunning = false;
   }
@@ -15,7 +15,7 @@ public abstract class Screen {
   public abstract void draw();
   public abstract void stop();
   
-  public PImage getScreen() {
+  public PGraphics getScreen() {
     return this.canvas;
   }
   
