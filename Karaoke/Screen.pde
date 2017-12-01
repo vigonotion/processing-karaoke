@@ -3,7 +3,7 @@ public abstract class Screen {
   PGraphics canvas;
   Karaoke karaoke;
   
-  boolean isRunning;
+  public boolean isRunning;
   
   public Screen(Karaoke karaoke) {
     this.canvas = createGraphics(width, height, P2D);

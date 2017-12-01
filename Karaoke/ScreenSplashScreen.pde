@@ -28,7 +28,6 @@ class ScreenSplashScreen extends Screen {
     
     canvas.background(0);
     canvas.image(assets.image_Splash, width/2 - this.splashSize/2, height/2 - this.splashSize/2, this.splashSize, this.splashSize);
-    
     canvas.endDraw();
   }
   
