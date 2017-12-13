@@ -1,9 +1,9 @@
 private Assets assets;
 
 private ScreenManager screenManager;
-
 private ScreenSingingGame screenSingingGame;
-private ScreenSplashScreen screenSplash;
+
+boolean gameLoaded = false;
 
 void setup() {
   
@@ -21,14 +21,26 @@ void setup() {
   
   // Create a screen
   screenManager.setScreen(new ScreenSplashScreen(this));
+  
+  // Load Game in separate thread
+  thread("loadGameThread");
 }
 
 void draw() {
   screenManager.draw();
   image(screenManager.getScreen(), 0, 0);
+  
+  if(gameLoaded) screenManager.setScreen(screenSingingGame);
+  gameLoaded = false;
 }
 
 // Allow other classes to use main assets
 public Assets getAssets() {
   return this.assets;
+}
+
+public void loadGameThread() {
+  screenSingingGame = new ScreenSingingGame(this);
+  screenSingingGame.start();
+  this.gameLoaded = true;
 }
