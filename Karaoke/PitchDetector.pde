@@ -45,8 +45,13 @@ public class PitchDetector {
   }
   
   // This converts a Band Number to the corresponding frequency
-  float bandToFrequency(int band) {
+  private float bandToFrequency(int band) {
     return band * SAMPLERATE / BANDS / 2;
+  }
+  
+  // Converts a Frequency to the Corresponding Midi Tone (with decimals!)
+  private float frequencyToMidi(float frequency) {
+    return 69+12*( log(frequency/440)/log(2) ); 
   }
   
   public void setAudioIn(AudioIn audioIn) {
