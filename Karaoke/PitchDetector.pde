@@ -12,6 +12,7 @@ public class PitchDetector {
 
   private Amplitude analyzer;
   private FFT fft;
+  private LowPass lowPass;
 
   public PitchDetector(Karaoke karaoke, AudioIn audioIn, int sampleRate, int bands) {
 
@@ -22,6 +23,9 @@ public class PitchDetector {
     this.BANDS = bands;
 
     spectrum = new float[SAMPLERATE];
+
+    lowPass = new LowPass(karaoke);
+    lowPass.process(audioIn);
 
     analyzer = new Amplitude(karaoke);
     analyzer.input(audioIn);
