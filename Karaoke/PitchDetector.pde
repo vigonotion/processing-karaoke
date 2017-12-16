@@ -55,12 +55,12 @@ public class PitchDetector {
   }
 
   // Converts a Frequency to the Corresponding Midi Tone (with decimals!)
-  private float frequencyToMidi(float frequency) {
+  public float frequencyToMidi(float frequency) {
     return 69+12*( log(frequency/440)/log(2) );
   }
 
   // Normalizes the Midi note (0-12)
-  private float normalizeMidi(float midi) {
+  public float normalizeMidi(float midi) {
     if(midi > 127) midi = 127;
     else if(midi < 0) midi = 0;
 
@@ -70,6 +70,11 @@ public class PitchDetector {
     nearest %= 12;
 
     return nearest + offset;
+  }
+
+  // Combines the methods normalizeMidi() and frequencyToMidi() for ease of use
+  public float frequencyToNormalizedMidi(float frequency) {
+    return normalizeMidi(frequencyToMidi(frequency));
   }
 
   // Override the current Audio Input

@@ -35,6 +35,10 @@ class NoteElement {
     return this.duration;
   }
 
+  public int getPitch() {
+    return this.pitch;
+  }
+
   @Override
   public String toString() {
     return noteType + " " + position + " " + duration + " " + pitch + " " + syllable;

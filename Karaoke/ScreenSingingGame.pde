@@ -2,6 +2,8 @@ import processing.video.*;
 
 public class ScreenSingingGame extends Screen {
 
+  private final long ANALYZATION_DELAY = 20;
+
   private Assets assets;
 
   private Movie movie;
@@ -9,6 +11,12 @@ public class ScreenSingingGame extends Screen {
 
   private String firstLine = "";
   private String secondLine = "";
+
+  private AudioIn mic1;
+
+  private PitchDetector detector1;
+
+  private long lastAnalysed;
 
   public ScreenSingingGame(Karaoke karaoke) {
     super(karaoke);
@@ -19,6 +27,12 @@ public class ScreenSingingGame extends Screen {
     this.movie.frameRate(24);
 
     this.kFile = new KaraokeFile("C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.txt");
+
+    this.mic1 = new AudioIn(this.karaoke, 1);
+    this.mic1.start();
+    this.detector1 = new PitchDetector(this.karaoke, this.mic1, 44100, 2048);
+
+    this.lastAnalysed = millis();
   }
 
   @Override
@@ -119,6 +133,41 @@ public class ScreenSingingGame extends Screen {
     if(kFile.getLatestNoteRow() != null)
     for(NoteElement e : kFile.getLatestNoteRow().noteElements) {
       //println(e);
+    }
+
+    canvas.fill(255,100,80);
+    if(kFile.hasActiveNote())
+      canvas.rect(20, 20, 20, 20);
+
+    // Analyze the current note
+    if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
+      float mic1frequency = detector1.getCurrentFrequency();
+
+      NoteElement e = kFile.getLatestNoteElement();
+
+      int currentNote = e.getPitch();
+      int currentMidiNormalized = (int)(detector1.normalizeMidi(currentNote));
+
+      float sungMidiNormalized = detector1.frequencyToNormalizedMidi(mic1frequency);
+
+      float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
+
+      // Add a circular offset (because 12 is nearer to 1 than to 7...)
+      float offset = 0;
+      if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
+      else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
+      else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
+
+      // Adjust difficulty
+      offset *= 0.8;
+
+      println(sungMidiNormalized + " should have been" + currentMidiNormalized);
+      println("results in offset " + offset + "\n");
+
+      canvas.fill(255,100,80);
+      canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
+
+      this.lastAnalysed = millis();
     }
 
     canvas.endDraw();

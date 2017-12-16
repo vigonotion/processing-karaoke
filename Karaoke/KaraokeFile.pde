@@ -230,6 +230,11 @@ class KaraokeFile {
     return (currentBeatDouble > e.position + e.duration);
   }
 
+  // Returns true if there is currently a note to be sung
+  private boolean hasActiveNote() {
+    return (getLatestNoteElement() != null && !sung(getLatestNoteElement()) && singing(getLatestNoteElement()));
+  }
+
   private String getLatestSyllable(boolean offset) {
 
     NoteElement biggestEl = getLatestNoteElement(offset);
@@ -253,6 +258,10 @@ class KaraokeFile {
 
   public ArrayList<NoteElement> getNoteElements() {
     return this.noteElements;
+  }
+
+  public int getCurrentBeat() {
+    return this.currentBeat;
   }
 
 }
