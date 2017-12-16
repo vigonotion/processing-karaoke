@@ -264,4 +264,8 @@ class KaraokeFile {
     return this.currentBeat;
   }
 
+  public double getCurrentBeatDouble() {
+    return this.currentBeatDouble;
+  }
+
 }

@@ -17,6 +17,7 @@ public class ScreenSingingGame extends Screen {
   private PitchDetector detector1;
 
   private long lastAnalysed;
+  private ArrayList<SungNoteElement> notesSung;
 
   public ScreenSingingGame(Karaoke karaoke) {
     super(karaoke);
@@ -33,6 +34,7 @@ public class ScreenSingingGame extends Screen {
     this.detector1 = new PitchDetector(this.karaoke, this.mic1, 44100, 2048);
 
     this.lastAnalysed = millis();
+    this.notesSung = new ArrayList<SungNoteElement>();
   }
 
   @Override
@@ -112,27 +114,32 @@ public class ScreenSingingGame extends Screen {
 
     canvas.strokeWeight(0);
 
+    // Draw all the notes to be sung
     for(NoteElement e : kFile.getNoteElements()) {
       canvas.fill(220);
 
       if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
         canvas.fill(224,184,134);
 
-      if(kFile.sung(e))
+      // If already sung, change appearance
+      boolean sungNote = kFile.sung(e);
+      if(sungNote)
         canvas.fill(43,221,160);
 
       canvas.rect(width/2 + bubblePos + e.position * kFile.bpm/8, height/2 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
 
-      if(!kFile.sung(e) && kFile.singing(e)) {
+      // Change note appearance if this is currently being sung (or played)
+      if(!sungNote && kFile.singing(e)) {
         canvas.fill(43,221,160);
         canvas.rect(width/2, height/2 - e.pitch * 15, - (float)(kFile.currentBeatDouble - e.position)* kFile.bpm/8, 15, 15);
       }
 
     }
 
-    if(kFile.getLatestNoteRow() != null)
-    for(NoteElement e : kFile.getLatestNoteRow().noteElements) {
-      //println(e);
+    // Draw the offsets of notes already sung
+    for(SungNoteElement e : notesSung) {
+      canvas.fill(255,100,80, 80);
+      canvas.rect(width/2 + bubblePos + (float)e.getCurrentBeatDouble() * kFile.bpm/8, height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 1 * kFile.bpm/8, 15, 15);
     }
 
     canvas.fill(255,100,80);
@@ -159,13 +166,15 @@ public class ScreenSingingGame extends Screen {
       else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
 
       // Adjust difficulty
-      offset *= 0.8;
+      offset *= 0.5;
 
       println(sungMidiNormalized + " should have been" + currentMidiNormalized);
       println("results in offset " + offset + "\n");
 
       canvas.fill(255,100,80);
       canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
+
+      notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
 
       this.lastAnalysed = millis();
     }
