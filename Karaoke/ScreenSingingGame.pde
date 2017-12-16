@@ -168,9 +168,6 @@ public class ScreenSingingGame extends Screen {
       // Adjust difficulty
       offset *= 0.5;
 
-      println(sungMidiNormalized + " should have been" + currentMidiNormalized);
-      println("results in offset " + offset + "\n");
-
       canvas.fill(255,100,80);
       canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
 
