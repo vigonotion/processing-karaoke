@@ -2,7 +2,7 @@ class ScreenMainMenu extends Screen {
 
   private final int COVER_SIZE = 250;
   private final int COVER_SIZE_SELECTED = 500;
-  private final int COVER_GAP = 650;
+  private final int COVER_GAP = 500;
 
   private Assets assets;
 
