@@ -109,8 +109,6 @@ class ScreenMainMenu extends Screen {
   }
 
   private void loadSong() {
-    println("Loading song " + selectedSong);
-
     this.karaoke.loadGameThread(karaokeFiles.get(selectedSong));
   }
 
