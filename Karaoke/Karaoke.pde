@@ -19,11 +19,15 @@ void setup() {
   // Create Screen Manager
   screenManager = new ScreenManager(this);
 
+  screenManager.setScreen(new MainMenuScreen(this));
+  
+  /* @TODO: add this to main menu loader
   // Create a screen
   screenManager.setScreen(new ScreenSplashScreen(this));
 
   // Load Game in separate thread
   thread("loadGameThread");
+  */
 }
 
 void draw() {
