@@ -109,7 +109,22 @@ class ScreenMainMenu extends Screen {
   }
 
   private void loadSong() {
-    this.karaoke.loadGameThread(karaokeFiles.get(selectedSong));
+    //this.karaoke.loadGameThread(karaokeFiles.get(selectedSong));
+    new Thread(){
+      public void run(){
+
+        karaoke.loadScreen.start();
+        karaoke.screenManager.setScreen(karaoke.loadScreen);
+
+        ScreenSingingGame screenSingingGame = new ScreenSingingGame(karaoke, karaokeFiles.get(selectedSong));
+        screenSingingGame.start();
+        karaoke.screenManager.setScreen(screenSingingGame);
+
+        karaoke.loadScreen.stop();
+
+      }
+    }.start();
+
   }
 
   @Override
