@@ -2,7 +2,7 @@ class KaraokeFile {
 
   private ArrayList<NoteElement> noteElements;
 
-  int bpm;
+  float bpm;
   int gap;
 
   String artist;
@@ -46,7 +46,7 @@ class KaraokeFile {
         String key = kv[0];
         String value = kv[1];
 
-        if(key.equals("#BPM")) bpm = Integer.valueOf(value);
+        if(key.equals("#BPM")) bpm = Float.valueOf(value.replace(",", "."));
         if(key.equals("#GAP")) gap = Integer.valueOf(value);
 
         if(key.equals("#ARTIST")) artist = (value);
@@ -246,7 +246,8 @@ class KaraokeFile {
 
   // Returns true if there is currently a note to be sung
   private boolean hasActiveNote() {
-    return (getLatestNoteElement() != null && !sung(getLatestNoteElement()) && singing(getLatestNoteElement()));
+    NoteElement e = getLatestNoteElement();
+    return (e != null && !sung(e) && singing(e) && e.noteType != NoteElement.NOTE_TYPE_LINEBREAK);
   }
 
   private String getLatestSyllable(boolean offset) {

@@ -120,6 +120,8 @@ public class ScreenSingingGame extends Screen {
 
       if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
         canvas.fill(224,184,134);
+      else if(e.noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+        continue;
 
       // If already sung, change appearance
       boolean sungNote = kFile.sung(e);
@@ -138,6 +140,9 @@ public class ScreenSingingGame extends Screen {
 
     // Draw the offsets of notes already sung
     for(SungNoteElement e : notesSung) {
+      if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+        continue;
+
       canvas.fill(255,100,80, 80);
       canvas.rect(width/2 + bubblePos + (float)e.getCurrentBeatDouble() * kFile.bpm/8, height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 1 * kFile.bpm/8, 15, 15);
     }
