@@ -8,6 +8,9 @@ class KaraokeFile {
   String artist;
   String title;
 
+  private PImage cover;
+  private String moviePath;
+
   long startTime;
   int currentBeat;
   double currentBeatDouble;
@@ -16,11 +19,16 @@ class KaraokeFile {
   Dot dot;
 
   ArrayList<NoteRow> noteRows;
+  private File rawFile;
 
   public KaraokeFile(String file) {
 
+    this.rawFile = new File(file);
+
     this.artist = "Unknown Artist";
     this.title = "Unknown Title";
+
+    this.cover = loadImage("assets/unknown.jpg");
 
     dot = new Dot();
 
@@ -29,13 +37,10 @@ class KaraokeFile {
     noteElements = new ArrayList<NoteElement>();
     noteRows = new ArrayList<NoteRow>();
 
-    println("there are " + lines.length + " lines");
     for (int i = 0 ; i < lines.length; i++) {
       if(lines[i] == null || lines[i].charAt(0) == 'E') continue;
 
       if(lines[i].charAt(0) == '#') {
-
-        println("Setting: " + lines[i]);
 
         String[] kv = split(lines[i], ':');
         String key = kv[0];
@@ -46,6 +51,15 @@ class KaraokeFile {
 
         if(key.equals("#ARTIST")) artist = (value);
         if(key.equals("#TITLE")) title = (value);
+
+        if(key.equals("#COVER")) {
+          String coverLocation = rawFile.getParent() + "\\" + (value);
+          cover = loadImage(coverLocation);
+        }
+
+        if(key.equals("#VIDEO")) {
+          this.moviePath = rawFile.getParent() + "\\" + (value);
+        }
 
       } else {
         String[] elements = splitCommands(lines[i]);
@@ -266,6 +280,14 @@ class KaraokeFile {
 
   public double getCurrentBeatDouble() {
     return this.currentBeatDouble;
+  }
+
+  public PImage getCover() {
+    return this.cover;
+  }
+
+  public String getMoviePath() {
+    return this.moviePath;
   }
 
 }

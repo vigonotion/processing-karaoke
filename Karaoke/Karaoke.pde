@@ -19,8 +19,8 @@ void setup() {
   // Create Screen Manager
   screenManager = new ScreenManager(this);
 
-  screenManager.setScreen(new MainMenuScreen(this));
-  
+  screenManager.setScreen(new ScreenMainMenu(this));
+
   /* @TODO: add this to main menu loader
   // Create a screen
   screenManager.setScreen(new ScreenSplashScreen(this));
@@ -43,8 +43,16 @@ public Assets getAssets() {
   return this.assets;
 }
 
-public void loadGameThread() {
-  screenSingingGame = new ScreenSingingGame(this);
+public void loadGameThread(KaraokeFile kFile) {
+  screenSingingGame = new ScreenSingingGame(this, kFile);
   screenSingingGame.start();
   this.gameLoaded = true;
+}
+
+void keyPressed() {
+  screenManager.keyPressed();
+}
+
+void keyReleased() {
+  screenManager.keyReleased();
 }

@@ -19,15 +19,15 @@ public class ScreenSingingGame extends Screen {
   private long lastAnalysed;
   private ArrayList<SungNoteElement> notesSung;
 
-  public ScreenSingingGame(Karaoke karaoke) {
+  public ScreenSingingGame(Karaoke karaoke, KaraokeFile kFile) {
     super(karaoke);
 
     this.assets = this.karaoke.getAssets();
 
-    this.movie = new Movie(this.karaoke, "C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.mp4");
-    this.movie.frameRate(24);
+    this.kFile = kFile;
 
-    this.kFile = new KaraokeFile("C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\rolling_in_the_deep.txt");
+    this.movie = new Movie(this.karaoke, kFile.getMoviePath());
+    this.movie.frameRate(24);
 
     this.mic1 = new AudioIn(this.karaoke, 1);
     this.mic1.start();
