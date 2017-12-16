@@ -14,7 +14,7 @@ To add those to Processing, click `Sketch > Import Library > Add Library` and se
 # Prerequisites
 Due to copyright restrictions, I'm unable to share the Karaoke files.
 You can download music videos from YouTube and use Karaoke Files made for UltraStar.
-Change the file locations in `Karaoke/ScreenSingingGame.pde`.
+Put them in a folder and change `songFolder` in `Karaoke/ScreenMainMenu.pde`.
 
 # Run
 Press run in the Processing IDE.
