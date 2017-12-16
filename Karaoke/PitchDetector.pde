@@ -34,6 +34,7 @@ public class PitchDetector {
     fft.input(audioIn);
   }
 
+  // Use a Fast Fourier Transformation to get the current frequency
   public float getCurrentFrequency() {
 
     // Analyze the spectrum
@@ -58,6 +59,20 @@ public class PitchDetector {
     return 69+12*( log(frequency/440)/log(2) );
   }
 
+  // Normalizes the Midi note (0-12)
+  private float normalizeMidi(float midi) {
+    if(midi > 127) midi = 127;
+    else if(midi < 0) midi = 0;
+
+    int nearest = (int) midi;
+    float offset = midi - nearest;
+
+    nearest %= 12;
+
+    return nearest + offset;
+  }
+
+  // Override the current Audio Input
   public void setAudioIn(AudioIn audioIn) {
     this.audioIn = audioIn;
   }
