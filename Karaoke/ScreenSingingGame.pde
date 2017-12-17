@@ -186,7 +186,7 @@ public class ScreenSingingGame extends Screen {
 
   @Override
   public void stop() {
-
+    this.isRunning = false;
   }
 
 }
