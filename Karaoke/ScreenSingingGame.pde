@@ -5,6 +5,7 @@ public class ScreenSingingGame extends Screen {
   private final long ANALYZATION_DELAY = 20;
 
   private boolean isPaused;
+  private int selectedIndex = 0;
 
   private Assets assets;
 
@@ -62,6 +63,7 @@ public class ScreenSingingGame extends Screen {
 
     canvas.tint(50);
     canvas.image(movie, 0, 0, width, height);
+    canvas.textAlign(LEFT);
 
     // Show the Pause Screen
     if(isPaused) {
@@ -73,6 +75,22 @@ public class ScreenSingingGame extends Screen {
       canvas.textFont(assets.font_QuickSand);
       canvas.textSize(30);
       canvas.text(kFile.getArtist() + " - " + kFile.getTitle(), 50, 130);
+
+      canvas.textFont(assets.font_OpenSans);
+      canvas.textSize(42);
+      canvas.textAlign(CENTER, CENTER);
+      canvas.text("FORTSETZEN", width/2, height/2 - 100);
+      canvas.text("HAUPTMENÜ", width/2, height/2 + 100);
+
+      canvas.strokeWeight(2);
+      canvas.noFill();
+      canvas.stroke(255);
+
+      canvas.rectMode(CENTER);
+      if(selectedIndex == 0) canvas.rect(width/2, height/2 - 100 + 10, 400, 100, 5);
+      else canvas.rect(width/2, height/2 + 100 + 10, 400, 100, 5);
+
+
     }
 
     // Or show the Game Screen
@@ -207,6 +225,28 @@ public class ScreenSingingGame extends Screen {
       }
 
       this.isPaused = !this.isPaused;
+    }
+
+    if(keyCode == DOWN) selectedIndex++;
+    else if(keyCode == UP) selectedIndex--;
+    selectedIndex %= 2;
+
+    if(keyCode == ENTER && this.isPaused) {
+
+      // FORTSETZEN
+      if(selectedIndex == 0) {
+        this.isPaused = false;
+        this.movie.play();
+      }
+
+      // HAUPTMENÜ
+      else {
+        ScreenMainMenu screen = new ScreenMainMenu(karaoke);
+        screen.start();
+        karaoke.screenManager.setScreen(screen);
+        this.stop();
+      }
+
     }
   }
 
