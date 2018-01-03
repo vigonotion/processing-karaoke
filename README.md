@@ -7,7 +7,7 @@ Tested with Processing 3.3.6, others may work too.
 
 You will also need to add some libraries:
 - [Processing Video](https://processing.org/reference/libraries/video/index.html)
-- [Processing Audio](https://processing.org/reference/libraries/sound/index.html)
+- [Processing Sound](https://processing.org/reference/libraries/sound/index.html)
 
 To add those to Processing, click `Sketch > Import Library > Add Library` and search them.
 
