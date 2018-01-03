@@ -10,9 +10,11 @@ public class PitchDetector {
   private final Karaoke karaoke;
   private AudioIn audioIn;
 
-  private Amplitude analyzer;
   private FFT fft;
   private LowPass lowPass;
+
+  private float frequency;
+  private float volume;
 
   public PitchDetector(Karaoke karaoke, AudioIn audioIn, int sampleRate, int bands) {
 
@@ -27,15 +29,13 @@ public class PitchDetector {
     lowPass = new LowPass(karaoke);
     lowPass.process(audioIn);
 
-    analyzer = new Amplitude(karaoke);
-    analyzer.input(audioIn);
-
     fft = new FFT(karaoke, BANDS);
     fft.input(audioIn);
   }
 
-  // Use a Fast Fourier Transformation to get the current frequency
-  public float getCurrentFrequency() {
+  public void analyze() {
+
+    // Use a Fast Fourier Transformation to get the current frequency
 
     // Analyze the spectrum
     fft.analyze(spectrum);
@@ -46,7 +46,16 @@ public class PitchDetector {
       if(spectrum[i] > spectrum[biggestBand]) biggestBand = i;
     }
 
-    return bandToFrequency(biggestBand);
+    this.volume = spectrum[biggestBand];
+    this.frequency = bandToFrequency(biggestBand);
+  }
+
+  public float getFrequency() {
+    return this.frequency;
+  }
+
+  public float getVolume() {
+    return this.volume;
   }
 
   // This converts a Band Number to the corresponding frequency
@@ -55,6 +64,10 @@ public class PitchDetector {
   }
 
   // Converts a Frequency to the Corresponding Midi Tone (with decimals!)
+  // Based on the formular found on Wikipedia:
+  //
+  // MIDI tuning standard. (2017, May 19). In Wikipedia, The Free Encyclopedia.
+  // Retrieved 18:14, January 3, 2018, from https://en.wikipedia.org/w/index.php?title=MIDI_tuning_standard&oldid=781221785
   public float frequencyToMidi(float frequency) {
     return 69+12*( log(frequency/440)/log(2) );
   }

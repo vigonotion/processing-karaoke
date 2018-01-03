@@ -2,12 +2,12 @@ public class SungNoteElement {
 
   private NoteElement noteElement;
   private float offset;
-  private double currentBeatDouble;
+  private double position;
 
-  public SungNoteElement(NoteElement noteElement, float offset, double currentBeatDouble) {
+  public SungNoteElement(NoteElement noteElement, float offset, double position) {
     this.noteElement = noteElement;
     this.offset = offset;
-    this.currentBeatDouble = currentBeatDouble;
+    this.position = position;
   }
 
 	/**
@@ -27,11 +27,11 @@ public class SungNoteElement {
 	}
 
 	/**
-	* Returns value of currentBeatDouble
+	* Returns value of position
 	* @return
 	*/
-	public double getCurrentBeatDouble() {
-		return this.currentBeatDouble;
+	public double getPosition() {
+		return this.position;
 	}
 
 	/**
@@ -51,10 +51,10 @@ public class SungNoteElement {
 	}
 
 	/**
-	* Sets new value of currentBeatDouble
+	* Sets new value of position
 	* @param
 	*/
-	public void setCurrentBeatDouble(double currentBeatDouble) {
-		this.currentBeatDouble = currentBeatDouble;
+	public void setPosition(double position) {
+		this.position = position;
 	}
 }

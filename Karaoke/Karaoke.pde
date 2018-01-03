@@ -18,6 +18,8 @@ void settings() {
     fullScreen(P2D, getSettingsManager().getIntegerSetting("monitor"));
   } else {
     size(getSettingsManager().getIntegerSetting("width"), getSettingsManager().getIntegerSetting("height"), P2D);
+
+    // For some reason, you can't set the frameRate if sketch is in fullScreen mode.
     frameRate(getSettingsManager().getIntegerSetting("frameRate"));
   }
 }

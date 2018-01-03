@@ -3,6 +3,7 @@ import processing.video.*;
 public class ScreenSingingGame extends Screen {
 
   private final long ANALYZATION_DELAY = 20;
+  private final int NOTE_OFFSET = 100;
 
   private boolean isPaused;
   private int selectedIndex = 0;
@@ -95,28 +96,35 @@ public class ScreenSingingGame extends Screen {
 
     // Or show the Game Screen
     else {
+
+      // Draw the title
       canvas.fill(255);
       canvas.textFont(assets.font_QuickSand_Bold);
       canvas.textSize(42);
       canvas.text(kFile.getTitle(), 50, 90);
 
+      // Draw the subtitle
       canvas.textFont(assets.font_QuickSand);
       canvas.textSize(30);
       canvas.text(kFile.getArtist(), 50, 130);
 
-
+      // Update the Karaoke File (syncs everything to movie time)
       kFile.update();
 
+      // Clear lyrics lines...
       firstLine = "";
       secondLine = "";
+
+      // and fill them if new data is available
       if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().toString());
       if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().toString());
 
+      // Draw the first line
       canvas.textFont(assets.font_OpenSans);
-
       canvas.textSize(54);
       canvas.text(firstLine, width/2 - canvas.textWidth(firstLine)/2, height - 150);
 
+      // Set the new position for the dot
       if(!firstLine.equals("")
       && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null)
       {
@@ -132,78 +140,94 @@ public class ScreenSingingGame extends Screen {
         kFile.dot.setX(-100);
       }
 
+      // Draw dot
+      canvas.ellipse(kFile.dot.getX(), height-220 - kFile.dot.getY(), 10, 10);
+
+      // Draw the second lyrics line
       canvas.textSize(36);
       canvas.text(secondLine, width/2 - canvas.textWidth(secondLine)/2, height - 80);
 
+      // Draw notes
+      int bubblePos = 0;
 
-      canvas.ellipse(kFile.dot.getX(), height-220 - kFile.dot.getY(), 10, 10);
+      NoteRow row = kFile.getLatestNoteRow();
 
-      int bubblePos = (int)( -kFile.currentBeatDouble * kFile.bpm/8);
+      if(!firstLine.equals("")
+      && row != null) {
 
-      canvas.strokeWeight(0);
+        for(NoteElement e : row.getNoteElements()) {
 
-      // Draw all the notes to be sung
-      for(NoteElement e : kFile.getNoteElements()) {
-        canvas.fill(220);
+          canvas.fill(220);
+          canvas.strokeWeight(0);
 
-        if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
-          canvas.fill(224,184,134);
-        else if(e.noteType == NoteElement.NOTE_TYPE_LINEBREAK)
-          continue;
+          if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
+            canvas.fill(224,184,134);
+          else if(e.noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+            continue;
 
-        // If already sung, change appearance
-        boolean sungNote = kFile.sung(e);
-        if(sungNote)
-          canvas.fill(43,221,160);
+          // If already sung, change appearance
+          boolean sungNote = kFile.sung(e);
+          if(sungNote)
+            canvas.fill(43,221,160);
 
-        canvas.rect(width/2 + bubblePos + e.position * kFile.bpm/8, height/2 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
+          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - e.pitch * 15, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), 15, 15);
 
-        // Change note appearance if this is currently being sung (or played)
-        if(!sungNote && kFile.singing(e)) {
-          canvas.fill(43,221,160);
-          canvas.rect(width/2, height/2 - e.pitch * 15, - (float)(kFile.currentBeatDouble - e.position)* kFile.bpm/8, 15, 15);
+          // Change note appearance if this is currently being sung (or played)
+          if(!sungNote && kFile.singing(e)) {
+            canvas.fill(43,221,160);
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - e.pitch * 15, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), 15, 15);
+          }
+
+        }
+
+        // Draw the notes which have been sung
+        for(SungNoteElement e : notesSung) {
+          if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+            continue;
+
+          canvas.fill(255,100,80, 80);
+          canvas.fill(43,221,160, 80);
+          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 15, 15, 15); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+        }
+
+        // Analyze the current note
+        if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
+
+          detector1.analyze();
+          float mic1frequency = detector1.getFrequency();
+          float mic1volume = detector1.getVolume();
+
+          NoteElement e = kFile.getLatestNoteElement();
+
+          int currentNote = e.getPitch();
+          int currentMidiNormalized = (int)(detector1.normalizeMidi(currentNote));
+
+          float sungMidiNormalized = detector1.frequencyToNormalizedMidi(mic1frequency);
+
+          float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
+
+          // Add a circular offset (because 12 is nearer to 1 than to 7...)
+          float offset = 0;
+          if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
+          else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
+          else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
+
+          // Adjust difficulty
+          offset *= 0.5;
+
+          //canvas.fill(255,100,80);
+          //canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
+
+          // Add sung note to list (only if there really was input on the microphone, checked by volume)
+          if(mic1volume > 0.005f)
+          notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
+
+          this.lastAnalysed = millis();
         }
 
       }
 
-      // Draw the offsets of notes already sung
-      for(SungNoteElement e : notesSung) {
-        if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
-          continue;
 
-        canvas.fill(255,100,80, 80);
-        canvas.rect(width/2 + bubblePos + (float)e.getCurrentBeatDouble() * kFile.bpm/8, height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 1 * kFile.bpm/8, 15, 15);
-      }
-
-      // Analyze the current note
-      if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
-        float mic1frequency = detector1.getCurrentFrequency();
-
-        NoteElement e = kFile.getLatestNoteElement();
-
-        int currentNote = e.getPitch();
-        int currentMidiNormalized = (int)(detector1.normalizeMidi(currentNote));
-
-        float sungMidiNormalized = detector1.frequencyToNormalizedMidi(mic1frequency);
-
-        float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
-
-        // Add a circular offset (because 12 is nearer to 1 than to 7...)
-        float offset = 0;
-        if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
-        else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
-        else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
-
-        // Adjust difficulty
-        offset *= 0.5;
-
-        canvas.fill(255,100,80);
-        canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
-
-        notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
-
-        this.lastAnalysed = millis();
-      }
     }
 
     canvas.endDraw();
@@ -216,12 +240,13 @@ public class ScreenSingingGame extends Screen {
 
   @Override
   public void keyPressed() {
+    // Detect if [esc] key is pressed
     if (keyCode == 27) {
       key = 0;
       if(this.isPaused == false) {
-        this.movie.pause();
+        this.movie.pause(); // and pause game
       } else {
-        this.movie.play();
+        this.movie.play(); // or continue game
       }
 
       this.isPaused = !this.isPaused;

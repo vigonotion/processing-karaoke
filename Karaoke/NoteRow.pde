@@ -31,6 +31,14 @@ class NoteRow {
     return this.firstBeat;
   }
 
+  public int getEndBeat() {
+    return this.endBeat;
+  }
+
+  public int getDuration() {
+    return this.endBeat - this.firstBeat;
+  }
+
   public int getSyllablePosition(NoteElement e) {
     return this.noteElements.indexOf(e);
   }
@@ -50,5 +58,9 @@ class NoteRow {
     }
 
     return lasts;
+  }
+
+  public ArrayList<NoteElement> getNoteElements() {
+    return this.noteElements;
   }
 }

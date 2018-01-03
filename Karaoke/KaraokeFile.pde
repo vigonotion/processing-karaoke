@@ -175,7 +175,7 @@ class KaraokeFile {
     int cb = (!offset) ? currentBeat : (int)(((double) ((double)bpm * 4 / 60000) * (double) elapsedOffset));
 
     for(NoteRow r : noteRows) {
-      if(r.getFirstBeat() < cb && r.getFirstBeat() >= biggest && cb < r.endBeat) {
+      if(r.getFirstBeat() < cb && r.getFirstBeat() >= biggest && cb < r.getEndBeat()) {
         biggest = r.getFirstBeat();
         biggestRow = r;
       }
