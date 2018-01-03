@@ -8,3 +8,4 @@ application.macosx
 *.tmp
 files/*
 Karaoke/build/*
+Karaoke/assets/settings.ini

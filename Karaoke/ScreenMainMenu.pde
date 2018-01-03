@@ -6,7 +6,7 @@ class ScreenMainMenu extends Screen {
 
   private Assets assets;
 
-  private String songFolder = "C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\";
+  private String songFolder;
   private ArrayList<KaraokeFile> karaokeFiles;
 
   private int selectedSong = 0;
@@ -15,6 +15,7 @@ class ScreenMainMenu extends Screen {
     super(karaoke);
 
     this.assets = this.karaoke.getAssets();
+    this.songFolder = this.karaoke.getSettingsManager().getSetting("songFolder");
     this.karaokeFiles = new ArrayList<KaraokeFile>();
     listSongs();
   }

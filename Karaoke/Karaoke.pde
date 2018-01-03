@@ -1,4 +1,5 @@
 private Assets assets;
+private SettingsManager settingsManager;
 
 private ScreenManager screenManager;
 private ScreenSingingGame screenSingingGame;
@@ -7,12 +8,21 @@ private ScreenLoadGame loadScreen;
 
 boolean gameLoaded = false;
 
-void setup() {
+
+void settings() {
+  // Create Settings Manager
+  settingsManager = new SettingsManager("assets/settings.ini");
 
   // Window Settings, P2D as Renderer (faster)
-  //fullScreen(P2D);
-  size(1920, 1080, P2D);
-  frameRate(30);
+  if(getSettingsManager().getBooleanSetting("fullScreen")) {
+    fullScreen(P2D, getSettingsManager().getIntegerSetting("monitor"));
+  } else {
+    size(getSettingsManager().getIntegerSetting("width"), getSettingsManager().getIntegerSetting("height"), P2D);
+    frameRate(getSettingsManager().getIntegerSetting("frameRate"));
+  }
+}
+
+void setup() {
 
   // Create Assets class
   assets = new Assets();
@@ -39,6 +49,10 @@ void draw() {
 // Allow other classes to use main assets
 public Assets getAssets() {
   return this.assets;
+}
+
+public SettingsManager getSettingsManager() {
+  return this.settingsManager;
 }
 
 void keyPressed() {
