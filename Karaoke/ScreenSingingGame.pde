@@ -4,6 +4,9 @@ public class ScreenSingingGame extends Screen {
 
   private final long ANALYZATION_DELAY = 20;
 
+  private boolean isPaused;
+  private int selectedIndex = 0;
+
   private Assets assets;
 
   private Movie movie;
@@ -40,6 +43,7 @@ public class ScreenSingingGame extends Screen {
   @Override
   public void start() {
     this.isRunning = true;
+    this.isPaused = false;
     movie.play();
     kFile.play(movie);
     kFile.dot.play();
@@ -55,130 +59,151 @@ public class ScreenSingingGame extends Screen {
 
     if(movie.available()) {
       movie.read();
-
     }
 
     canvas.tint(50);
     canvas.image(movie, 0, 0, width, height);
+    canvas.textAlign(LEFT);
 
-    canvas.fill(255);
-    canvas.textFont(assets.font_QuickSand_Bold);
-    canvas.textSize(42);
-    canvas.text(kFile.getTitle(), 50, 90);
+    // Show the Pause Screen
+    if(isPaused) {
+      canvas.fill(255);
+      canvas.textFont(assets.font_QuickSand_Bold);
+      canvas.textSize(42);
+      canvas.text("Spiel pausiert", 50, 90);
 
-    canvas.textFont(assets.font_QuickSand);
-    canvas.textSize(30);
-    canvas.text(kFile.getArtist(), 50, 130);
+      canvas.textFont(assets.font_QuickSand);
+      canvas.textSize(30);
+      canvas.text(kFile.getArtist() + " - " + kFile.getTitle(), 50, 130);
+
+      canvas.textFont(assets.font_OpenSans);
+      canvas.textSize(42);
+      canvas.textAlign(CENTER, CENTER);
+      canvas.text("FORTSETZEN", width/2, height/2 - 100);
+      canvas.text("HAUPTMENÜ", width/2, height/2 + 100);
+
+      canvas.strokeWeight(2);
+      canvas.noFill();
+      canvas.stroke(255);
+
+      canvas.rectMode(CENTER);
+      if(selectedIndex == 0) canvas.rect(width/2, height/2 - 100 + 10, 400, 100, 5);
+      else canvas.rect(width/2, height/2 + 100 + 10, 400, 100, 5);
 
 
-    kFile.update();
-
-    firstLine = "";
-    secondLine = "";
-    if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().toString());
-    if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().toString());
-
-    canvas.textFont(assets.font_OpenSans);
-
-    canvas.textSize(54);
-    canvas.text(firstLine, width/2 - canvas.textWidth(firstLine)/2, height - 150);
-
-    if(!firstLine.equals("")
-    && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null)
-    {
-      int dest = -100;
-
-      dest = (int)( width/2 - canvas.textWidth(firstLine)/2
-      + canvas.textWidth(kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement(true)))
-      + canvas.textWidth(kFile.getLatestSyllable(true))/2);
-
-      if(!kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement(true)).equals("-1"))
-      kFile.dot.setDestination(dest);
-    } else {
-      kFile.dot.setX(-100);
     }
 
-    canvas.textSize(36);
-    canvas.text(secondLine, width/2 - canvas.textWidth(secondLine)/2, height - 80);
+    // Or show the Game Screen
+    else {
+      canvas.fill(255);
+      canvas.textFont(assets.font_QuickSand_Bold);
+      canvas.textSize(42);
+      canvas.text(kFile.getTitle(), 50, 90);
+
+      canvas.textFont(assets.font_QuickSand);
+      canvas.textSize(30);
+      canvas.text(kFile.getArtist(), 50, 130);
 
 
-    canvas.ellipse(kFile.dot.getX(), height-220 - kFile.dot.getY(), 10, 10);
+      kFile.update();
 
-    int bubblePos = (int)( -kFile.currentBeatDouble * kFile.bpm/8);
+      firstLine = "";
+      secondLine = "";
+      if(kFile.getLatestNoteRow() != null) firstLine = (kFile.getLatestNoteRow().toString());
+      if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().toString());
 
-    /*
-    strokeWeight(1);
-    stroke(0);
-    line(width/2, 0, width/2, height);
-    */
+      canvas.textFont(assets.font_OpenSans);
 
-    canvas.strokeWeight(0);
+      canvas.textSize(54);
+      canvas.text(firstLine, width/2 - canvas.textWidth(firstLine)/2, height - 150);
 
-    // Draw all the notes to be sung
-    for(NoteElement e : kFile.getNoteElements()) {
-      canvas.fill(220);
+      if(!firstLine.equals("")
+      && kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement()) != null)
+      {
+        int dest = -100;
 
-      if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
-        canvas.fill(224,184,134);
-      else if(e.noteType == NoteElement.NOTE_TYPE_LINEBREAK)
-        continue;
+        dest = (int)( width/2 - canvas.textWidth(firstLine)/2
+        + canvas.textWidth(kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement(true)))
+        + canvas.textWidth(kFile.getLatestSyllable(true))/2);
 
-      // If already sung, change appearance
-      boolean sungNote = kFile.sung(e);
-      if(sungNote)
-        canvas.fill(43,221,160);
-
-      canvas.rect(width/2 + bubblePos + e.position * kFile.bpm/8, height/2 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
-
-      // Change note appearance if this is currently being sung (or played)
-      if(!sungNote && kFile.singing(e)) {
-        canvas.fill(43,221,160);
-        canvas.rect(width/2, height/2 - e.pitch * 15, - (float)(kFile.currentBeatDouble - e.position)* kFile.bpm/8, 15, 15);
+        if(!kFile.getLatestNoteRow().getLastSyllables(kFile.getLatestNoteElement(true)).equals("-1"))
+        kFile.dot.setDestination(dest);
+      } else {
+        kFile.dot.setX(-100);
       }
 
-    }
+      canvas.textSize(36);
+      canvas.text(secondLine, width/2 - canvas.textWidth(secondLine)/2, height - 80);
 
-    // Draw the offsets of notes already sung
-    for(SungNoteElement e : notesSung) {
-      if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
-        continue;
 
-      canvas.fill(255,100,80, 80);
-      canvas.rect(width/2 + bubblePos + (float)e.getCurrentBeatDouble() * kFile.bpm/8, height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 1 * kFile.bpm/8, 15, 15);
-    }
+      canvas.ellipse(kFile.dot.getX(), height-220 - kFile.dot.getY(), 10, 10);
 
-    canvas.fill(255,100,80);
-    if(kFile.hasActiveNote())
-      canvas.rect(20, 20, 20, 20);
+      int bubblePos = (int)( -kFile.currentBeatDouble * kFile.bpm/8);
 
-    // Analyze the current note
-    if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
-      float mic1frequency = detector1.getCurrentFrequency();
+      canvas.strokeWeight(0);
 
-      NoteElement e = kFile.getLatestNoteElement();
+      // Draw all the notes to be sung
+      for(NoteElement e : kFile.getNoteElements()) {
+        canvas.fill(220);
 
-      int currentNote = e.getPitch();
-      int currentMidiNormalized = (int)(detector1.normalizeMidi(currentNote));
+        if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
+          canvas.fill(224,184,134);
+        else if(e.noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+          continue;
 
-      float sungMidiNormalized = detector1.frequencyToNormalizedMidi(mic1frequency);
+        // If already sung, change appearance
+        boolean sungNote = kFile.sung(e);
+        if(sungNote)
+          canvas.fill(43,221,160);
 
-      float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
+        canvas.rect(width/2 + bubblePos + e.position * kFile.bpm/8, height/2 - e.pitch * 15, e.duration * kFile.bpm/8, 15, 15);
 
-      // Add a circular offset (because 12 is nearer to 1 than to 7...)
-      float offset = 0;
-      if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
-      else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
-      else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
+        // Change note appearance if this is currently being sung (or played)
+        if(!sungNote && kFile.singing(e)) {
+          canvas.fill(43,221,160);
+          canvas.rect(width/2, height/2 - e.pitch * 15, - (float)(kFile.currentBeatDouble - e.position)* kFile.bpm/8, 15, 15);
+        }
 
-      // Adjust difficulty
-      offset *= 0.5;
+      }
 
-      canvas.fill(255,100,80);
-      canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
+      // Draw the offsets of notes already sung
+      for(SungNoteElement e : notesSung) {
+        if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+          continue;
 
-      notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
+        canvas.fill(255,100,80, 80);
+        canvas.rect(width/2 + bubblePos + (float)e.getCurrentBeatDouble() * kFile.bpm/8, height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 1 * kFile.bpm/8, 15, 15);
+      }
 
-      this.lastAnalysed = millis();
+      // Analyze the current note
+      if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
+        float mic1frequency = detector1.getCurrentFrequency();
+
+        NoteElement e = kFile.getLatestNoteElement();
+
+        int currentNote = e.getPitch();
+        int currentMidiNormalized = (int)(detector1.normalizeMidi(currentNote));
+
+        float sungMidiNormalized = detector1.frequencyToNormalizedMidi(mic1frequency);
+
+        float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
+
+        // Add a circular offset (because 12 is nearer to 1 than to 7...)
+        float offset = 0;
+        if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
+        else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
+        else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
+
+        // Adjust difficulty
+        offset *= 0.5;
+
+        canvas.fill(255,100,80);
+        canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
+
+        notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
+
+        this.lastAnalysed = millis();
+      }
     }
 
     canvas.endDraw();
@@ -186,7 +211,43 @@ public class ScreenSingingGame extends Screen {
 
   @Override
   public void stop() {
+    this.isRunning = false;
+  }
 
+  @Override
+  public void keyPressed() {
+    if (keyCode == 27) {
+      key = 0;
+      if(this.isPaused == false) {
+        this.movie.pause();
+      } else {
+        this.movie.play();
+      }
+
+      this.isPaused = !this.isPaused;
+    }
+
+    if(keyCode == DOWN) selectedIndex++;
+    else if(keyCode == UP) selectedIndex--;
+    selectedIndex %= 2;
+
+    if(keyCode == ENTER && this.isPaused) {
+
+      // FORTSETZEN
+      if(selectedIndex == 0) {
+        this.isPaused = false;
+        this.movie.play();
+      }
+
+      // HAUPTMENÜ
+      else {
+        ScreenMainMenu screen = new ScreenMainMenu(karaoke);
+        screen.start();
+        karaoke.screenManager.setScreen(screen);
+        this.stop();
+      }
+
+    }
   }
 
 }

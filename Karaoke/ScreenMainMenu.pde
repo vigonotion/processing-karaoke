@@ -2,11 +2,11 @@ class ScreenMainMenu extends Screen {
 
   private final int COVER_SIZE = 250;
   private final int COVER_SIZE_SELECTED = 500;
-  private final int COVER_GAP = 650;
+  private final int COVER_GAP = 500;
 
   private Assets assets;
 
-  private String songFolder = "C:\\Users\\tom\\SynologyDrive\\Studium\\Informatik 1 Projekt\\Karaoke\\processing-karaoke\\files\\";
+  private String songFolder;
   private ArrayList<KaraokeFile> karaokeFiles;
 
   private int selectedSong = 0;
@@ -15,6 +15,7 @@ class ScreenMainMenu extends Screen {
     super(karaoke);
 
     this.assets = this.karaoke.getAssets();
+    this.songFolder = this.karaoke.getSettingsManager().getSetting("songFolder");
     this.karaokeFiles = new ArrayList<KaraokeFile>();
     listSongs();
   }
@@ -109,7 +110,22 @@ class ScreenMainMenu extends Screen {
   }
 
   private void loadSong() {
-    this.karaoke.loadGameThread(karaokeFiles.get(selectedSong));
+    //this.karaoke.loadGameThread(karaokeFiles.get(selectedSong));
+    new Thread(){
+      public void run(){
+
+        karaoke.loadScreen.start();
+        karaoke.screenManager.setScreen(karaoke.loadScreen);
+
+        ScreenSingingGame screenSingingGame = new ScreenSingingGame(karaoke, karaokeFiles.get(selectedSong));
+        screenSingingGame.start();
+        karaoke.screenManager.setScreen(screenSingingGame);
+
+        karaoke.loadScreen.stop();
+
+      }
+    }.start();
+
   }
 
   @Override
