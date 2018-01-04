@@ -1,19 +1,18 @@
 public class Player {
 
   Karaoke karaoke;
-  AudioIn microphone;
+  AudioInput microphone;
   PitchDetector detector;
 
   private color noteColor;
 
   ArrayList<SungNoteElement> notesSung;
 
-  public Player(Karaoke karaoke, AudioIn microphone, color noteColor) {
+  public Player(Karaoke karaoke, AudioInput microphone, color noteColor) {
     this.karaoke = karaoke;
     this.microphone = microphone;
     this.noteColor = noteColor;
 
-    this.microphone.start();
     this.detector = new PitchDetector(this.karaoke, this.microphone, 44100, 2048);
     this.notesSung = new ArrayList<SungNoteElement>();
   }

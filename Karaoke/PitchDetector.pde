@@ -1,36 +1,26 @@
-import processing.sound.*;
+import ddf.minim.analysis.*;
+import ddf.minim.ugens.*;
 
 public class PitchDetector {
 
   private final int SAMPLERATE;
-  private final int BANDS;
-
-  private float[] spectrum;
 
   private final Karaoke karaoke;
-  private AudioIn audioIn;
+  private AudioInput audioInput;
 
   private FFT fft;
-  private LowPass lowPass;
 
   private float frequency;
   private float volume;
 
-  public PitchDetector(Karaoke karaoke, AudioIn audioIn, int sampleRate, int bands) {
+  public PitchDetector(Karaoke karaoke, AudioInput audioInput, int sampleRate, int bands) {
 
     this.karaoke = karaoke;
-    this.audioIn = audioIn;
+    this.audioInput = audioInput;
 
     this.SAMPLERATE = sampleRate;
-    this.BANDS = bands;
 
-    spectrum = new float[SAMPLERATE];
-
-    lowPass = new LowPass(karaoke);
-    lowPass.process(audioIn);
-
-    fft = new FFT(karaoke, BANDS);
-    fft.input(audioIn);
+    fft = new FFT(audioInput.left.size(), SAMPLERATE);
   }
 
   public void analyze() {
@@ -38,16 +28,17 @@ public class PitchDetector {
     // Use a Fast Fourier Transformation to get the current frequency
 
     // Analyze the spectrum
-    fft.analyze(spectrum);
+    fft.forward(audioInput.mix);
 
     // Get the band with highest frequency
-    int biggestBand = 0;
-    for(int i = 0; i < SAMPLERATE; i++){
-      if(spectrum[i] > spectrum[biggestBand]) biggestBand = i;
+    this.frequency = 0;
+    this.volume = 0;
+    for(int i = 0; i < SAMPLERATE/2; i++) {
+      if(fft.getFreq(i) > this.volume) {
+        this.frequency = i;
+        this.volume = fft.getFreq(i);
+      }
     }
-
-    this.volume = spectrum[biggestBand];
-    this.frequency = bandToFrequency(biggestBand);
   }
 
   public float getFrequency() {
@@ -58,10 +49,6 @@ public class PitchDetector {
     return this.volume;
   }
 
-  // This converts a Band Number to the corresponding frequency
-  private float bandToFrequency(int band) {
-    return band * SAMPLERATE / BANDS / 2;
-  }
 
   // Converts a Frequency to the Corresponding Midi Tone (with decimals!)
   // Based on the formular found on Wikipedia:
@@ -91,8 +78,8 @@ public class PitchDetector {
   }
 
   // Override the current Audio Input
-  public void setAudioIn(AudioIn audioIn) {
-    this.audioIn = audioIn;
+  public void setAudioInput(AudioInput audioInput) {
+    this.audioInput = audioInput;
   }
 
 }

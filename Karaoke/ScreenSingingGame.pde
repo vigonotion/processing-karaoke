@@ -38,8 +38,8 @@ public class ScreenSingingGame extends Screen {
     this.movie = new Movie(this.karaoke, kFile.getMoviePath());
     this.movie.frameRate(24);
 
-    this.player1 = new Player(this.karaoke, new AudioIn(this.karaoke, 1), color(43,221,160));
-    if(isMultiplayer) this.player2 = new Player(this.karaoke, new AudioIn(this.karaoke, 0), color(230,0,126));
+    this.player1 = new Player(this.karaoke, this.karaoke.getAudioManager().getAudioInput(1), color(43,221,160));
+    if(isMultiplayer) this.player2 = new Player(this.karaoke, this.karaoke.getAudioManager().getAudioInput(2), color(230,0,126));
 
     this.lastAnalysed = millis();
 

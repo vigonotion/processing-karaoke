@@ -1,5 +1,6 @@
 private Assets assets;
 private SettingsManager settingsManager;
+private AudioManager audioManager;
 
 private ScreenManager screenManager;
 private ScreenSingingGame screenSingingGame;
@@ -30,6 +31,9 @@ void setup() {
   assets = new Assets();
   assets.init();
 
+  // Create Audio Manager
+  audioManager = new AudioManager(this);
+
   // Create Screen Manager
   screenManager = new ScreenManager(this);
 
@@ -55,6 +59,10 @@ public Assets getAssets() {
 
 public SettingsManager getSettingsManager() {
   return this.settingsManager;
+}
+
+public AudioManager getAudioManager() {
+  return this.audioManager;
 }
 
 void keyPressed() {
