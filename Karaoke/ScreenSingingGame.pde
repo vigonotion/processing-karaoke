@@ -2,10 +2,14 @@ import processing.video.*;
 
 public class ScreenSingingGame extends Screen {
 
+  // HARD CODED SETTINGS
   private final long ANALYZATION_DELAY = 20;
   private final int NOTE_OFFSET = 100;
   private final int NOTE_HEIGHT = 10;
-  private final int MULTIPLAYER_GAP = 200;
+  private final int MULTIPLAYER_GAP = 300;
+
+  // ADJUSTABLE ONE-TIME SETTINGS
+  private final boolean isMultiplayer = true;
 
   private boolean isPaused;
   private int selectedIndex = 0;
@@ -19,6 +23,7 @@ public class ScreenSingingGame extends Screen {
   private String secondLine = "";
 
   private Player player1;
+  private Player player2;
 
   private long lastAnalysed;
   private int vOffset;
@@ -33,7 +38,8 @@ public class ScreenSingingGame extends Screen {
     this.movie = new Movie(this.karaoke, kFile.getMoviePath());
     this.movie.frameRate(24);
 
-    this.player1 = new Player(this.karaoke, new AudioIn(this.karaoke, 1));
+    this.player1 = new Player(this.karaoke, new AudioIn(this.karaoke, 1), color(43,221,160));
+    if(isMultiplayer) this.player2 = new Player(this.karaoke, new AudioIn(this.karaoke, 0), color(230,0,126));
 
     this.lastAnalysed = millis();
 
@@ -49,6 +55,7 @@ public class ScreenSingingGame extends Screen {
     this.kFile.play(movie);
     this.kFile.dot.play();
     this.player1.start();
+    if(isMultiplayer) this.player2.start();
   }
 
   @Override
@@ -149,8 +156,6 @@ public class ScreenSingingGame extends Screen {
       canvas.text(secondLine, width/2 - canvas.textWidth(secondLine)/2, height - 80);
 
       // Draw notes
-      int bubblePos = 0;
-
       NoteRow row = kFile.getLatestNoteRow();
 
       if(!firstLine.equals("")
@@ -168,58 +173,103 @@ public class ScreenSingingGame extends Screen {
 
           // If already sung, change appearance
           boolean sungNote = kFile.sung(e);
-          if(sungNote)
-            canvas.fill(43,221,160);
 
-          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+          if(isMultiplayer) {
 
-          // Change note appearance if this is currently being sung (or played)
-          if(!sungNote && kFile.singing(e)) {
-            canvas.fill(43,221,160);
-            // @TODO: this currently draws from the middle?
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+            if(sungNote) canvas.fill(player1.getNoteColor());
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+
+            if(sungNote) canvas.fill(player2.getNoteColor());
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+
+            if(!sungNote && kFile.singing(e)) {
+              canvas.fill(player1.getNoteColor());
+              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+
+              canvas.fill(player2.getNoteColor());
+              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+            }
+
+          } else {
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+
+            // Change note appearance if this is currently being sung (or played)
+            if(!sungNote && kFile.singing(e)) {
+              canvas.fill(43,221,160);
+              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+            }
           }
 
         }
 
-        // Draw the notes which have been sung
+        // Draw the notes which have been sung (Player 1)
         for(SungNoteElement e : player1.notesSung) {
           if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
             continue;
 
-          canvas.fill(255,100,80, 80);
-          canvas.fill(43,221,160, 80);
-          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+          //canvas.fill(255,100,80, 80);
+
+          // Adds alpha to the color
+          //
+          // Processing 1.0 - Processing Discourse - Set the alpha of a color variable? by Casey Fry
+          // Retrieved 23:48, January 4, 2018, https://processing.org/discourse/beta/num_1261125421.html
+          canvas.fill((player1.getNoteColor() & 0xffffff) | (80 << 24));
+
+          if(isMultiplayer)
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+          else
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+
+        }
+
+        // ...Player 2
+        if(isMultiplayer)
+        for(SungNoteElement e : player2.notesSung) {
+          if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+            continue;
+
+            // Adds alpha to the color
+            //
+            // Processing 1.0 - Processing Discourse - Set the alpha of a color variable? by Casey Fry
+            // Retrieved 23:48, January 4, 2018, https://processing.org/discourse/beta/num_1261125421.html
+            canvas.fill((player2.getNoteColor() & 0xffffff) | (80 << 24));
+
+          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + MULTIPLAYER_GAP/2 - vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
         }
 
         // Analyze the current note
         if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
 
+          float mic1frequency, mic2frequency;
+          float mic1volume, mic2volume;
+
           player1.getDetector().analyze();
-          float mic1frequency = player1.getDetector().getFrequency();
-          float mic1volume = player1.getDetector().getVolume();
+          mic1frequency = player1.getDetector().getFrequency();
+          mic1volume = player1.getDetector().getVolume();
+
+          if(isMultiplayer) {
+            player2.getDetector().analyze();
+            mic2frequency = player2.getDetector().getFrequency();
+            mic2volume = player2.getDetector().getVolume();
+          }
 
           NoteElement e = kFile.getLatestNoteElement();
 
-          int currentNote = e.getPitch();
-          int currentMidiNormalized = (int)(player1.getDetector().normalizeMidi(currentNote));
+          float offset1, offset2;
 
-          float sungMidiNormalized = player1.getDetector().frequencyToNormalizedMidi(mic1frequency);
+          offset1 = player1.getOffset(e.getPitch(), mic1frequency);
+          if(isMultiplayer) offset2 = player2.getOffset(e.getPitch(), mic2frequency);
 
-          float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
-
-          // Add a circular offset (because 12 is nearer to 1 than to 7...)
-          float offset = 0;
-          if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
-          else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
-          else if(abs(offsetRaw[2]) <= 5.5) offset = offsetRaw[2];
-
-          // Adjust difficulty
-          offset *= 0.5;
+          // Adjust difficulty (smaller means easier)
+          offset1 *= 0.5;
+          offset2 *= 0.5;
 
           // Add sung note to list (only if there really was input on the microphone, checked by volume)
           if(mic1volume > 0.005f)
-          player1.notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
+          player1.notesSung.add(new SungNoteElement(e, offset1, kFile.getCurrentBeatDouble()));
+
+          if(isMultiplayer && mic2volume > 0.005f)
+          player2.notesSung.add(new SungNoteElement(e, offset2, kFile.getCurrentBeatDouble()));
 
           this.lastAnalysed = millis();
         }
