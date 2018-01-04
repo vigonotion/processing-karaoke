@@ -4,6 +4,8 @@ public class ScreenSingingGame extends Screen {
 
   private final long ANALYZATION_DELAY = 20;
   private final int NOTE_OFFSET = 100;
+  private final int NOTE_HEIGHT = 10;
+  private final int MULTIPLAYER_GAP = 200;
 
   private boolean isPaused;
   private int selectedIndex = 0;
@@ -16,12 +18,10 @@ public class ScreenSingingGame extends Screen {
   private String firstLine = "";
   private String secondLine = "";
 
-  private AudioIn mic1;
-
-  private PitchDetector detector1;
+  private Player player1;
 
   private long lastAnalysed;
-  private ArrayList<SungNoteElement> notesSung;
+  private int vOffset;
 
   public ScreenSingingGame(Karaoke karaoke, KaraokeFile kFile) {
     super(karaoke);
@@ -33,21 +33,22 @@ public class ScreenSingingGame extends Screen {
     this.movie = new Movie(this.karaoke, kFile.getMoviePath());
     this.movie.frameRate(24);
 
-    this.mic1 = new AudioIn(this.karaoke, 1);
-    this.mic1.start();
-    this.detector1 = new PitchDetector(this.karaoke, this.mic1, 44100, 2048);
+    this.player1 = new Player(this.karaoke, new AudioIn(this.karaoke, 1));
 
     this.lastAnalysed = millis();
-    this.notesSung = new ArrayList<SungNoteElement>();
+
+    // Calculate the vertical offset to align notes in center
+    this.vOffset = int((kFile.getPitchRange() * NOTE_HEIGHT) / 2);
   }
 
   @Override
   public void start() {
     this.isRunning = true;
     this.isPaused = false;
-    movie.play();
-    kFile.play(movie);
-    kFile.dot.play();
+    this.movie.play();
+    this.kFile.play(movie);
+    this.kFile.dot.play();
+    this.player1.start();
   }
 
   @Override
@@ -170,39 +171,40 @@ public class ScreenSingingGame extends Screen {
           if(sungNote)
             canvas.fill(43,221,160);
 
-          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - e.pitch * 15, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), 15, 15);
+          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
 
           // Change note appearance if this is currently being sung (or played)
           if(!sungNote && kFile.singing(e)) {
             canvas.fill(43,221,160);
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - e.pitch * 15, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), 15, 15);
+            // @TODO: this currently draws from the middle?
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
           }
 
         }
 
         // Draw the notes which have been sung
-        for(SungNoteElement e : notesSung) {
+        for(SungNoteElement e : player1.notesSung) {
           if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
             continue;
 
           canvas.fill(255,100,80, 80);
           canvas.fill(43,221,160, 80);
-          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getNoteElement().getPitch() - e.getOffset()) * 15, 15, 15, 15); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
         }
 
         // Analyze the current note
         if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
 
-          detector1.analyze();
-          float mic1frequency = detector1.getFrequency();
-          float mic1volume = detector1.getVolume();
+          player1.getDetector().analyze();
+          float mic1frequency = player1.getDetector().getFrequency();
+          float mic1volume = player1.getDetector().getVolume();
 
           NoteElement e = kFile.getLatestNoteElement();
 
           int currentNote = e.getPitch();
-          int currentMidiNormalized = (int)(detector1.normalizeMidi(currentNote));
+          int currentMidiNormalized = (int)(player1.getDetector().normalizeMidi(currentNote));
 
-          float sungMidiNormalized = detector1.frequencyToNormalizedMidi(mic1frequency);
+          float sungMidiNormalized = player1.getDetector().frequencyToNormalizedMidi(mic1frequency);
 
           float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
 
@@ -215,12 +217,9 @@ public class ScreenSingingGame extends Screen {
           // Adjust difficulty
           offset *= 0.5;
 
-          //canvas.fill(255,100,80);
-          //canvas.rect(width/2 - 15, height/2 - (currentNote - offset) * 15, 15, 15, 15);
-
           // Add sung note to list (only if there really was input on the microphone, checked by volume)
           if(mic1volume > 0.005f)
-          notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
+          player1.notesSung.add(new SungNoteElement(e, offset, kFile.getCurrentBeatDouble()));
 
           this.lastAnalysed = millis();
         }

@@ -259,6 +259,19 @@ class KaraokeFile {
 
   }
 
+  // This gets the difference between the lowest and the highest note
+  private int getPitchRange() {
+
+    int biggestPitch = noteElements.get(0).getPitch();
+    int smallestPitch = noteElements.get(0).getPitch();
+    for(NoteElement e : noteElements) {
+      if(e.getPitch() > biggestPitch) biggestPitch = e.getPitch();
+      if(e.getPitch() < smallestPitch) smallestPitch = e.getPitch();
+    }
+
+    return abs(biggestPitch - smallestPitch);
+  }
+
   private String getLatestSyllable() {
     return getLatestSyllable(false);
   }
