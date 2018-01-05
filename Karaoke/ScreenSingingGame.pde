@@ -7,8 +7,6 @@ public class ScreenSingingGame extends Screen {
   private final int NOTE_OFFSET = 100;
   private final int NOTE_HEIGHT = 10;
   private final int MULTIPLAYER_GAP = 200;
-  private final int SCOREBAR_WIDTH = 600;
-  private final int SCOREBAR_HEIGHT = 30;
 
   private final boolean DEBUG_GUI = false;
 
@@ -29,6 +27,8 @@ public class ScreenSingingGame extends Screen {
   private Player player1;
   private Player player2;
 
+  private ScoreBar scoreBar;
+
   private long lastAnalysed;
   private int vOffset;
   private int pitchAv;
@@ -46,6 +46,8 @@ public class ScreenSingingGame extends Screen {
     this.player1 = new Player(this.karaoke, this.karaoke.getAudioManager().getAudioInput(1), color(43,221,160));
     if(isMultiplayer) this.player2 = new Player(this.karaoke, this.karaoke.getAudioManager().getAudioInput(2), color(230,0,126));
 
+    if(isMultiplayer) this.scoreBar = new ScoreBar(this.karaoke, this.player1, this.player2);
+
     this.lastAnalysed = millis();
 
   }
@@ -54,6 +56,7 @@ public class ScreenSingingGame extends Screen {
   public void start() {
     this.player1.start();
     if(isMultiplayer) this.player2.start();
+    if(isMultiplayer) this.scoreBar.start();
 
     this.kFile.play(movie);
     this.kFile.dot.play();
@@ -78,7 +81,9 @@ public class ScreenSingingGame extends Screen {
 
     canvas.tint(50);
     canvas.image(movie, 0, 0, width, height);
+
     canvas.textAlign(LEFT);
+    canvas.noTint();
 
     // Show the Pause Screen
     if(isPaused) {
@@ -126,7 +131,7 @@ public class ScreenSingingGame extends Screen {
       // Draw the score bar
       if(isMultiplayer) {
 
-        int score1 = player1.getScore();
+        /*int score1 = player1.getScore();
         int score2 = player2.getScore();
 
         canvas.strokeWeight(0);
@@ -142,6 +147,8 @@ public class ScreenSingingGame extends Screen {
         canvas.text(score1, width/2 - SCOREBAR_WIDTH/2, 130);
         canvas.textAlign(RIGHT);
         canvas.text(score2, width/2 + SCOREBAR_WIDTH/2, 130);
+        */
+        scoreBar.draw(canvas, width/2 - scoreBar.getCanvasWidth()/2, 60);
       }
 
       // Update the Karaoke File (syncs everything to movie time)
