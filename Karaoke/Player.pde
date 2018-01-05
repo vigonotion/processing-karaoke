@@ -46,4 +46,18 @@ public class Player {
     return this.noteColor;
   }
 
+  public int getScore() {
+
+    double score = 0;
+
+    for(SungNoteElement e : this.notesSung) {
+      score += map(constrain(abs(e.getOffset()), 0, 4), 0, 4, 12, 0);
+    }
+
+    // Start with a score of 1 to prevent arithmetic exception: / by zero
+    if(score==0) score=1;
+
+    return (int)(score);
+  }
+
 }

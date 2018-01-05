@@ -7,6 +7,8 @@ public class ScreenSingingGame extends Screen {
   private final int NOTE_OFFSET = 100;
   private final int NOTE_HEIGHT = 10;
   private final int MULTIPLAYER_GAP = 300;
+  private final int SCOREBAR_WIDTH = 600;
+  private final int SCOREBAR_HEIGHT = 30;
 
   // ADJUSTABLE ONE-TIME SETTINGS
   private final boolean isMultiplayer = true;
@@ -106,6 +108,7 @@ public class ScreenSingingGame extends Screen {
     else {
 
       // Draw the title
+      canvas.textAlign(LEFT);
       canvas.fill(255);
       canvas.textFont(assets.font_QuickSand_Bold);
       canvas.textSize(42);
@@ -115,6 +118,27 @@ public class ScreenSingingGame extends Screen {
       canvas.textFont(assets.font_QuickSand);
       canvas.textSize(30);
       canvas.text(kFile.getArtist(), 50, 130);
+
+      // Draw the score bar
+      if(isMultiplayer) {
+
+        int score1 = player1.getScore();
+        int score2 = player2.getScore();
+
+        canvas.strokeWeight(0);
+
+        canvas.fill(player2.getNoteColor());
+        canvas.rect(width/2 - SCOREBAR_WIDTH/2, 60, SCOREBAR_WIDTH, SCOREBAR_HEIGHT);
+
+        canvas.fill(player1.getNoteColor());
+        canvas.rect(width/2 - SCOREBAR_WIDTH/2, 60, (int)((float)SCOREBAR_WIDTH * ((float)score1 / (float)(score1 + score2))), SCOREBAR_HEIGHT);
+
+        canvas.fill(255);
+        canvas.textAlign(LEFT);
+        canvas.text(score1, width/2 - SCOREBAR_WIDTH/2, 130);
+        canvas.textAlign(RIGHT);
+        canvas.text(score2, width/2 + SCOREBAR_WIDTH/2, 130);
+      }
 
       // Update the Karaoke File (syncs everything to movie time)
       kFile.update();
@@ -128,6 +152,7 @@ public class ScreenSingingGame extends Screen {
       if(kFile.getNextNoteRow() != null) secondLine = (kFile.getNextNoteRow().toString());
 
       // Draw the first line
+      canvas.textAlign(LEFT);
       canvas.textFont(assets.font_OpenSans);
       canvas.textSize(54);
       canvas.text(firstLine, width/2 - canvas.textWidth(firstLine)/2, height - 150);
