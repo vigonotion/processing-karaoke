@@ -3,6 +3,7 @@ class ScreenSettings extends Screen {
   private final int SLIDER_WIDTH = 500;
   private final int SLIDER_HEIGHT = 30;
   private final int KNOB_WIDTH = 10;
+  private final int CHECKBOX_WIDTH = 30;
 
   float sliderPosition[];
   int selectedInput[];
@@ -82,6 +83,31 @@ class ScreenSettings extends Screen {
     this.canvas.text("« Zurück zum Hauptmenü", 50, 130);
 
     // Draw the settings
+    // Multiplayer Checkbox
+    this.canvas.strokeWeight(2);
+    this.canvas.stroke(255);
+    if(this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")) this.canvas.fill(255);
+    else this.canvas.noFill();
+
+    this.canvas.rect(50, 250, CHECKBOX_WIDTH, CHECKBOX_WIDTH);
+
+    this.canvas.textFont(assets.font_OpenSans);
+    this.canvas.textSize(24);
+    this.canvas.strokeWeight(0);
+
+    this.canvas.fill(255);
+    this.canvas.textAlign(LEFT);
+    this.canvas.text("Mehrspieler", 50 + CHECKBOX_WIDTH + 20, 250 + CHECKBOX_WIDTH - 6);
+
+    if(this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")) {
+      this.canvas.noFill();
+      this.canvas.strokeWeight(2);
+      this.canvas.stroke(0);
+
+      this.canvas.line(50 + 2, 250 + 2, 50 + CHECKBOX_WIDTH - 2, 250 + CHECKBOX_WIDTH - 2);
+      this.canvas.line(50 + CHECKBOX_WIDTH - 2, 250 + 2, 50 + 2, 250 + CHECKBOX_WIDTH - 2);
+    }
+
 
 
     drawMicSettings(1);
@@ -186,6 +212,10 @@ class ScreenSettings extends Screen {
   public void mousePressed() {
 
     mouseClicked = true;
+
+    if( ( mouseX >= 50 && mouseX <= 50 + CHECKBOX_WIDTH && mouseY >= 250 && mouseY <= 250 + CHECKBOX_WIDTH )) {
+      this.karaoke.getSettingsManager().set("multiplayer", Boolean.toString(!this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")));
+    }
 
   }
 

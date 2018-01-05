@@ -11,7 +11,7 @@ public class ScreenSingingGame extends Screen {
   private final boolean DEBUG_GUI = false;
 
   // ADJUSTABLE ONE-TIME SETTINGS
-  private final boolean isMultiplayer = true;
+  private final boolean isMultiplayer;
 
   private boolean isPaused;
   private int selectedIndex = 0;
@@ -39,6 +39,8 @@ public class ScreenSingingGame extends Screen {
     this.assets = this.karaoke.getAssets();
 
     this.kFile = kFile;
+
+    this.isMultiplayer = this.karaoke.getSettingsManager().getBooleanSetting("multiplayer");
 
     this.movie = new Movie(this.karaoke, kFile.getMoviePath());
     this.movie.frameRate(24);
@@ -230,11 +232,12 @@ public class ScreenSingingGame extends Screen {
             }
 
           } else {
+            if(sungNote) canvas.fill(player1.getNoteColor());
             canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
 
             // Change note appearance if this is currently being sung (or played)
             if(!sungNote && kFile.singing(e)) {
-              canvas.fill(43,221,160);
+              canvas.fill(player1.getNoteColor());
               canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
             }
           }
@@ -282,8 +285,8 @@ public class ScreenSingingGame extends Screen {
           NoteElement e = kFile.getLatestNoteElement();
           if(e.getNoteType() != NoteElement.NOTE_TYPE_LINEBREAK && e.getNoteType() != NoteElement.NOTE_TYPE_FREESTYLE) {
 
-            float mic1frequency, mic2frequency;
-            float mic1volume, mic2volume;
+            float mic1frequency = 0, mic2frequency = 0;
+            float mic1volume = 0, mic2volume = 0;
 
             player1.getDetector().analyze();
             mic1frequency = player1.getDetector().getFrequency();
@@ -295,7 +298,7 @@ public class ScreenSingingGame extends Screen {
               mic2volume = player2.getDetector().getVolume();
             }
 
-            float offset1, offset2;
+            float offset1 = 0, offset2 = 0;
 
             offset1 = player1.getOffset(e.getPitch(), mic1frequency);
             if(isMultiplayer) offset2 = player2.getOffset(e.getPitch(), mic2frequency);
