@@ -191,15 +191,18 @@ public class ScreenSingingGame extends Screen {
           canvas.fill(220);
           canvas.strokeWeight(0);
 
-          if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN)
-            canvas.fill(224,184,134);
-          else if(e.noteType == NoteElement.NOTE_TYPE_LINEBREAK)
-            continue;
+          if(e.noteType == NoteElement.NOTE_TYPE_GOLDEN) canvas.fill(224,184,134);
 
           // If already sung, change appearance
           boolean sungNote = kFile.sung(e);
 
           if(isMultiplayer) {
+
+            if(e.noteType == NoteElement.NOTE_TYPE_FREESTYLE) {
+              canvas.strokeWeight(2);
+              canvas.stroke(220);
+              canvas.noFill();
+            }
 
             if(sungNote) canvas.fill(player1.getNoteColor());
             canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
@@ -229,7 +232,7 @@ public class ScreenSingingGame extends Screen {
 
         // Draw the notes which have been sung (Player 1)
         for(SungNoteElement e : player1.notesSung) {
-          if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+          if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK || e.getNoteElement().noteType == NoteElement.NOTE_TYPE_FREESTYLE)
             continue;
 
           //canvas.fill(255,100,80, 80);
@@ -250,7 +253,7 @@ public class ScreenSingingGame extends Screen {
         // ...Player 2
         if(isMultiplayer)
         for(SungNoteElement e : player2.notesSung) {
-          if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK)
+          if(e.getNoteElement().noteType == NoteElement.NOTE_TYPE_LINEBREAK || e.getNoteElement().noteType == NoteElement.NOTE_TYPE_FREESTYLE)
             continue;
 
             // Adds alpha to the color
