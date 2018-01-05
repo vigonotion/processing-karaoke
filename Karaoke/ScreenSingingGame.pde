@@ -56,7 +56,6 @@ public class ScreenSingingGame extends Screen {
   public void start() {
     this.player1.start();
     if(isMultiplayer) this.player2.start();
-    if(isMultiplayer) this.scoreBar.start();
 
     this.kFile.play(movie);
     this.kFile.dot.play();
@@ -306,10 +305,10 @@ public class ScreenSingingGame extends Screen {
             offset2 *= 0.5;
 
             // Add sung note to list (only if there really was input on the microphone, checked by volume)
-            if(mic1volume > 0.005f)
+            if(mic1volume > this.karaoke.getSettingsManager().getDoubleSetting("volume1"))
             player1.notesSung.add(new SungNoteElement(e, offset1, kFile.getCurrentBeatDouble()));
 
-            if(isMultiplayer && mic2volume > 0.005f)
+            if(isMultiplayer && mic2volume > this.karaoke.getSettingsManager().getDoubleSetting("volume2"))
             player2.notesSung.add(new SungNoteElement(e, offset2, kFile.getCurrentBeatDouble()));
 
             this.lastAnalysed = millis();
@@ -357,9 +356,8 @@ public class ScreenSingingGame extends Screen {
 
       // HAUPTMENÜ
       else {
-        ScreenMainMenu screen = new ScreenMainMenu(karaoke);
-        screen.start();
-        karaoke.screenManager.setScreen(screen);
+        this.karaoke.mainMenu.start();
+        this.karaoke.screenManager.setScreen(this.karaoke.mainMenu);
         this.stop();
       }
 

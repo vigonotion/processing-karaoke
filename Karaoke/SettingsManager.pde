@@ -31,8 +31,16 @@ public class SettingsManager {
     return settings.get(key);
   }
 
+  public String set(String key, String value) {
+    return settings.put(key, value);
+  }
+
   public int getIntegerSetting(String key) {
     return Integer.parseInt(getSetting(key));
+  }
+
+  public double getDoubleSetting(String key) {
+    return Double.parseDouble(getSetting(key));
   }
 
   public boolean getBooleanSetting(String key) {

@@ -8,9 +8,7 @@ public abstract class GUIElement {
     this.karaoke = karaoke;
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
-  }
 
-  public void start() {
     this.canvas = createGraphics(this.canvasWidth, this.canvasHeight, P2D);
   }
 

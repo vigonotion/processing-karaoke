@@ -6,6 +6,8 @@ private ScreenManager screenManager;
 private ScreenSingingGame screenSingingGame;
 
 private ScreenLoadGame loadScreen;
+private ScreenMainMenu mainMenu;
+private ScreenSettings settingsScreen;
 
 boolean gameLoaded = false;
 
@@ -39,8 +41,10 @@ void setup() {
 
 
   loadScreen = new ScreenLoadGame(this);
+  mainMenu = new ScreenMainMenu(this);
+  settingsScreen = new ScreenSettings(this);
 
-  screenManager.setScreen(new ScreenMainMenu(this));
+  screenManager.setScreen(mainMenu);
 
 }
 
@@ -71,4 +75,12 @@ void keyPressed() {
 
 void keyReleased() {
   screenManager.keyReleased();
+}
+
+void mousePressed() {
+  screenManager.mousePressed();
+}
+
+void mouseReleased() {
+  screenManager.mouseReleased();
 }

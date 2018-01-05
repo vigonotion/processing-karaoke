@@ -17,6 +17,8 @@ public abstract class Screen {
 
   public void keyPressed() { return; }
   public void keyReleased() { return; }
+  public void mousePressed() { return; }
+  public void mouseReleased() { return; }
 
   public PGraphics getScreen() {
     return this.canvas;

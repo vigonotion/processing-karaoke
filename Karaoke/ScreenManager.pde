@@ -42,6 +42,16 @@ public class ScreenManager extends Screen {
     currentScreen.keyReleased();
   }
 
+  public void mousePressed() {
+    if(currentScreen != null && currentScreen.isRunning)
+    currentScreen.mousePressed();
+  }
+
+  public void mouseReleased() {
+    if(currentScreen != null && currentScreen.isRunning)
+    currentScreen.mouseReleased();
+  }
+
   @Override
   public void stop() {
 

@@ -128,6 +128,11 @@ class ScreenMainMenu extends Screen {
 
   }
 
+  private void openSettings() {
+    this.karaoke.settingsScreen.start();
+    this.karaoke.screenManager.setScreen(this.karaoke.settingsScreen);
+  }
+
   @Override
   public void stop() {
 
@@ -142,6 +147,9 @@ class ScreenMainMenu extends Screen {
 
     // Select a song
     if(keyCode == ENTER) loadSong();
+
+    // Open Settings
+    if(keyCode == TAB) openSettings();
   }
 
 }

@@ -33,7 +33,7 @@ public class ScoreBar extends GUIElement {
       this.canvas.rect(SCOREBAR_HEIGHT, 0, SCOREBAR_WIDTH - SCOREBAR_HEIGHT, SCOREBAR_HEIGHT, 0, SCOREBAR_HEIGHT, SCOREBAR_HEIGHT, 0);
 
       this.canvas.fill(player1.getNoteColor());
-      this.canvas.rect(0, 0, constrain((int)((float)SCOREBAR_WIDTH * ((float)score1 / (float)(score1 + score2))), SCOREBAR_HEIGHT, SCOREBAR_WIDTH), SCOREBAR_HEIGHT, SCOREBAR_HEIGHT, 0, 0, SCOREBAR_HEIGHT);
+      this.canvas.rect(0, 0, constrain((int)((float)SCOREBAR_WIDTH * ((float)score1 / (float)(score1 + score2))), SCOREBAR_HEIGHT, SCOREBAR_WIDTH-SCOREBAR_HEIGHT), SCOREBAR_HEIGHT, SCOREBAR_HEIGHT, 0, 0, SCOREBAR_HEIGHT);
 
       this.canvas.textFont(assets.font_QuickSand);
       this.canvas.textSize(30);
