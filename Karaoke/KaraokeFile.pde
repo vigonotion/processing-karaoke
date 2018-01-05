@@ -11,7 +11,7 @@ class KaraokeFile {
   private PImage cover;
   private String moviePath;
 
-  long startTime;
+  float startTime;
   int currentBeat;
   double currentBeatDouble;
 
@@ -27,6 +27,8 @@ class KaraokeFile {
 
     this.artist = "Unknown Artist";
     this.title = "Unknown Title";
+
+    this.startTime = 0;
 
     this.cover = loadImage("assets/unknown.jpg");
 
@@ -48,6 +50,7 @@ class KaraokeFile {
 
         if(key.equals("#BPM")) bpm = Float.valueOf(value.replace(",", "."));
         if(key.equals("#GAP")) gap = Integer.valueOf(value);
+        if(key.equals("#START")) this.startTime = Float.valueOf(value);
 
         if(key.equals("#ARTIST")) artist = (value);
         if(key.equals("#TITLE")) title = (value);
@@ -145,14 +148,13 @@ class KaraokeFile {
   }
 
   public void play(Movie movie) {
-    //startTime = millis();
     this.movie = movie;
+    this.movie.jump(this.startTime);
   }
 
   int lastRow = 0;
 
   public void update() {
-    //long elapsed = (millis() - startTime) - gap;
     long elapsed = (long) (movie.time() * 1000) - gap;
 
     // You have to multiply the beats by 4 because they use quarter beats
