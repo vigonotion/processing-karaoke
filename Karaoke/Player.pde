@@ -13,7 +13,7 @@ public class Player {
     this.microphone = microphone;
     this.noteColor = noteColor;
 
-    this.detector = new PitchDetector(this.karaoke, this.microphone, 44100, 2048);
+    this.detector = new FFTPitchDetector(this.karaoke, this.microphone, 44100, 2048);
     this.notesSung = new ArrayList<SungNoteElement>();
   }
 
