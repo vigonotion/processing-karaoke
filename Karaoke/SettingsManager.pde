@@ -25,13 +25,6 @@ public class SettingsManager {
       settings.put(pair[0], pair[1]);
     }
 
-    // Debug
-    // Using an enhanced loop to iterate over each entry
-    for (Map.Entry me : settings.entrySet()) {
-      print(me.getKey() + " is ");
-      println(me.getValue());
-    }
-
   }
 
   public String getSetting(String key) {
