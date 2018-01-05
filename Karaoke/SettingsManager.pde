@@ -27,6 +27,28 @@ public class SettingsManager {
 
   }
 
+  public void save() {
+    // Load Settings to HashMap
+    for (int i = 0 ; i < lines.length; i++) {
+      if(lines[i] == null ||
+        lines[i] == "" ||
+        lines[i].length() == 0 ||
+        lines[i].charAt(0) == ';') continue;
+
+
+      String[] pair = split(lines[i], '=');
+      if(settings.containsKey(pair[0])) {
+          // If setting has changed since
+          if(pair[1] != settings.get(pair[0])) {
+            lines[i] = pair[0] + "=" + settings.get(pair[0]);
+          }
+      }
+
+    }
+
+    saveStrings(this.file, this.lines);
+  }
+
   public String getSetting(String key) {
     return settings.get(key);
   }

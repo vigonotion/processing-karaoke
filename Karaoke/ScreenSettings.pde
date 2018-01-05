@@ -232,6 +232,7 @@ class ScreenSettings extends Screen {
     // Exit to Main Menu
     if (keyCode == 27 || keyCode == TAB) {
       key = 0;
+      this.karaoke.getSettingsManager().save();
       this.karaoke.mainMenu.start();
       this.karaoke.screenManager.setScreen(this.karaoke.mainMenu);
     }

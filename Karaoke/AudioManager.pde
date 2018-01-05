@@ -32,11 +32,15 @@ public class AudioManager {
       this.in1 = null;
       this.minim1.setInputMixer(AudioSystem.getMixer(mixerInfo[mixer]));
       this.in1 = minim1.getLineIn(Minim.STEREO);
+
+      this.karaoke.getSettingsManager().set("mixer1", Integer.toString(mixer));
     } else if(input == 2) {
       if ( this.in2 != null ) this.in2.close();
       this.in2 = null;
       this.minim2.setInputMixer(AudioSystem.getMixer(mixerInfo[mixer]));
       this.in2 = minim2.getLineIn(Minim.STEREO);
+
+      this.karaoke.getSettingsManager().set("mixer2", Integer.toString(mixer));
     }
 
   }
