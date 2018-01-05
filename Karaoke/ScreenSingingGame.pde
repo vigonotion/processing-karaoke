@@ -57,10 +57,10 @@ public class ScreenSingingGame extends Screen {
     this.player1.start();
     if(isMultiplayer) this.player2.start();
 
+    this.movie.play();
+
     this.kFile.play(movie);
     this.kFile.dot.play();
-
-    this.movie.play();
 
     this.isRunning = true;
     this.isPaused = false;

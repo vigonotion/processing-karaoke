@@ -149,7 +149,11 @@ class KaraokeFile {
 
   public void play(Movie movie) {
     this.movie = movie;
-    if(this.startTime > 0) this.movie.jump(this.startTime);
+    if(this.startTime > 0) {
+      this.movie.pause();
+      this.movie.jump(this.startTime);
+      this.movie.play();
+    }
   }
 
   int lastRow = 0;
