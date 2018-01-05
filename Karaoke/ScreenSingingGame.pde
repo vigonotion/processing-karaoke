@@ -129,27 +129,7 @@ public class ScreenSingingGame extends Screen {
       canvas.text(kFile.getArtist(), 50, 130);
 
       // Draw the score bar
-      if(isMultiplayer) {
-
-        /*int score1 = player1.getScore();
-        int score2 = player2.getScore();
-
-        canvas.strokeWeight(0);
-
-        canvas.fill(player2.getNoteColor());
-        canvas.rect(width/2 - SCOREBAR_WIDTH/2, 60, SCOREBAR_WIDTH, SCOREBAR_HEIGHT);
-
-        canvas.fill(player1.getNoteColor());
-        canvas.rect(width/2 - SCOREBAR_WIDTH/2, 60, (int)((float)SCOREBAR_WIDTH * ((float)score1 / (float)(score1 + score2))), SCOREBAR_HEIGHT);
-
-        canvas.fill(255);
-        canvas.textAlign(LEFT);
-        canvas.text(score1, width/2 - SCOREBAR_WIDTH/2, 130);
-        canvas.textAlign(RIGHT);
-        canvas.text(score2, width/2 + SCOREBAR_WIDTH/2, 130);
-        */
-        scoreBar.draw(canvas, width/2 - scoreBar.getCanvasWidth()/2, 60);
-      }
+      if(isMultiplayer) scoreBar.draw(canvas, width/2 - scoreBar.getCanvasWidth()/2, 60);
 
       // Update the Karaoke File (syncs everything to movie time)
       kFile.update();
@@ -300,38 +280,40 @@ public class ScreenSingingGame extends Screen {
         // Analyze the current note
         if(kFile.hasActiveNote() && millis() - this.lastAnalysed > ANALYZATION_DELAY) {
 
-          float mic1frequency, mic2frequency;
-          float mic1volume, mic2volume;
-
-          player1.getDetector().analyze();
-          mic1frequency = player1.getDetector().getFrequency();
-          mic1volume = player1.getDetector().getVolume();
-
-          if(isMultiplayer) {
-            player2.getDetector().analyze();
-            mic2frequency = player2.getDetector().getFrequency();
-            mic2volume = player2.getDetector().getVolume();
-          }
-
           NoteElement e = kFile.getLatestNoteElement();
+          if(e.getNoteType() != NoteElement.NOTE_TYPE_LINEBREAK && e.getNoteType() != NoteElement.NOTE_TYPE_FREESTYLE) {
 
-          float offset1, offset2;
+            float mic1frequency, mic2frequency;
+            float mic1volume, mic2volume;
 
-          offset1 = player1.getOffset(e.getPitch(), mic1frequency);
-          if(isMultiplayer) offset2 = player2.getOffset(e.getPitch(), mic2frequency);
+            player1.getDetector().analyze();
+            mic1frequency = player1.getDetector().getFrequency();
+            mic1volume = player1.getDetector().getVolume();
 
-          // Adjust difficulty (smaller means easier)
-          offset1 *= 0.5;
-          offset2 *= 0.5;
+            if(isMultiplayer) {
+              player2.getDetector().analyze();
+              mic2frequency = player2.getDetector().getFrequency();
+              mic2volume = player2.getDetector().getVolume();
+            }
 
-          // Add sung note to list (only if there really was input on the microphone, checked by volume)
-          if(mic1volume > 0.005f)
-          player1.notesSung.add(new SungNoteElement(e, offset1, kFile.getCurrentBeatDouble()));
+            float offset1, offset2;
 
-          if(isMultiplayer && mic2volume > 0.005f)
-          player2.notesSung.add(new SungNoteElement(e, offset2, kFile.getCurrentBeatDouble()));
+            offset1 = player1.getOffset(e.getPitch(), mic1frequency);
+            if(isMultiplayer) offset2 = player2.getOffset(e.getPitch(), mic2frequency);
 
-          this.lastAnalysed = millis();
+            // Adjust difficulty (smaller means easier)
+            offset1 *= 0.5;
+            offset2 *= 0.5;
+
+            // Add sung note to list (only if there really was input on the microphone, checked by volume)
+            if(mic1volume > 0.005f)
+            player1.notesSung.add(new SungNoteElement(e, offset1, kFile.getCurrentBeatDouble()));
+
+            if(isMultiplayer && mic2volume > 0.005f)
+            player2.notesSung.add(new SungNoteElement(e, offset2, kFile.getCurrentBeatDouble()));
+
+            this.lastAnalysed = millis();
+          }
         }
 
       }
