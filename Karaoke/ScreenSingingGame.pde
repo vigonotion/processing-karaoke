@@ -6,9 +6,11 @@ public class ScreenSingingGame extends Screen {
   private final long ANALYZATION_DELAY = 20;
   private final int NOTE_OFFSET = 100;
   private final int NOTE_HEIGHT = 10;
-  private final int MULTIPLAYER_GAP = 300;
+  private final int MULTIPLAYER_GAP = 200;
   private final int SCOREBAR_WIDTH = 600;
   private final int SCOREBAR_HEIGHT = 30;
+
+  private final boolean DEBUG_GUI = false;
 
   // ADJUSTABLE ONE-TIME SETTINGS
   private final boolean isMultiplayer = true;
@@ -29,6 +31,7 @@ public class ScreenSingingGame extends Screen {
 
   private long lastAnalysed;
   private int vOffset;
+  private int pitchAv;
 
   public ScreenSingingGame(Karaoke karaoke, KaraokeFile kFile) {
     super(karaoke);
@@ -45,19 +48,20 @@ public class ScreenSingingGame extends Screen {
 
     this.lastAnalysed = millis();
 
-    // Calculate the vertical offset to align notes in center
-    this.vOffset = int((kFile.getPitchRange() * NOTE_HEIGHT) / 2);
   }
 
   @Override
   public void start() {
-    this.isRunning = true;
-    this.isPaused = false;
-    this.movie.play();
-    this.kFile.play(movie);
-    this.kFile.dot.play();
     this.player1.start();
     if(isMultiplayer) this.player2.start();
+
+    this.kFile.play(movie);
+    this.kFile.dot.play();
+
+    this.movie.play();
+
+    this.isRunning = true;
+    this.isPaused = false;
   }
 
   @Override
@@ -186,6 +190,27 @@ public class ScreenSingingGame extends Screen {
       if(!firstLine.equals("")
       && row != null) {
 
+        // Calculate the vertical offset to align notes in center
+        this.vOffset = int((kFile.getPitchRange(row.getNoteElements()) * NOTE_HEIGHT)) + MULTIPLAYER_GAP;
+        this.pitchAv = kFile.getPitchAverage(row.getNoteElements());
+
+        if(DEBUG_GUI) {
+          int offset = int((kFile.getPitchRange(row.getNoteElements()) * NOTE_HEIGHT));
+          canvas.noFill();
+          canvas.stroke(0,0,255);
+          canvas.strokeWeight(1);
+
+          canvas.line(0, height/2, width, height/2);
+
+          canvas.line(0, height/2 +0, width, height/2 +0);
+          canvas.line(0, height/2 +0, width, height/2 +0);
+
+          canvas.stroke(255,0,0);
+          canvas.rect(NOTE_OFFSET, height/2 - offset/2 - vOffset/2, width-(2*NOTE_OFFSET), offset);
+          canvas.rect(NOTE_OFFSET, height/2 - offset/2 + vOffset/2, width-(2*NOTE_OFFSET), offset);
+        }
+
+
         for(NoteElement e : row.getNoteElements()) {
 
           canvas.fill(220);
@@ -205,26 +230,26 @@ public class ScreenSingingGame extends Screen {
             }
 
             if(sungNote) canvas.fill(player1.getNoteColor());
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
 
             if(sungNote) canvas.fill(player2.getNoteColor());
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
 
             if(!sungNote && kFile.singing(e)) {
               canvas.fill(player1.getNoteColor());
-              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
 
               canvas.fill(player2.getNoteColor());
-              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + MULTIPLAYER_GAP/2 - vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
             }
 
           } else {
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset - e.pitch * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, (width - 2*NOTE_OFFSET) * ((float)e.duration / (float)(row.getDuration())), NOTE_HEIGHT, NOTE_HEIGHT);
 
             // Change note appearance if this is currently being sung (or played)
             if(!sungNote && kFile.singing(e)) {
               canvas.fill(43,221,160);
-              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset - e.pitch * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
+              canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getPitch() - this.pitchAv) * NOTE_HEIGHT, ((float)(kFile.currentBeatDouble - e.getPosition())/ (float)(row.getDuration()))* (width - 2*NOTE_OFFSET), NOTE_HEIGHT, NOTE_HEIGHT);
             }
           }
 
@@ -244,9 +269,9 @@ public class ScreenSingingGame extends Screen {
           canvas.fill((player1.getNoteColor() & 0xffffff) | (80 << 24));
 
           if(isMultiplayer)
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - MULTIPLAYER_GAP/2 - vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset/2 - (e.getNoteElement().getPitch() - this.pitchAv - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
           else
-            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+            canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 - (e.getNoteElement().getPitch() - this.pitchAv - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
 
         }
 
@@ -262,7 +287,7 @@ public class ScreenSingingGame extends Screen {
             // Retrieved 23:48, January 4, 2018, https://processing.org/discourse/beta/num_1261125421.html
             canvas.fill((player2.getNoteColor() & 0xffffff) | (80 << 24));
 
-          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + MULTIPLAYER_GAP/2 - vOffset - (e.getNoteElement().getPitch() - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
+          canvas.rect(NOTE_OFFSET + (width - 2*NOTE_OFFSET) * ((float)(e.getPosition() - row.getFirstBeat()) / (float)(row.getDuration())), height/2 + vOffset/2 - (e.getNoteElement().getPitch() - this.pitchAv - e.getOffset()) * NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT, NOTE_HEIGHT); //old width: (width - 2*NOTE_OFFSET) * (1f / (float)(row.getDuration()))
         }
 
         // Analyze the current note

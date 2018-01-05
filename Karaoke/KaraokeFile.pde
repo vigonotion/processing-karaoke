@@ -149,7 +149,7 @@ class KaraokeFile {
 
   public void play(Movie movie) {
     this.movie = movie;
-    this.movie.jump(this.startTime);
+    if(this.startTime > 0) this.movie.jump(this.startTime);
   }
 
   int lastRow = 0;
@@ -262,7 +262,7 @@ class KaraokeFile {
   }
 
   // This gets the difference between the lowest and the highest note
-  private int getPitchRange() {
+  public int getPitchRange(ArrayList<NoteElement> noteElements) {
 
     int biggestPitch = noteElements.get(0).getPitch();
     int smallestPitch = noteElements.get(0).getPitch();
@@ -272,6 +272,22 @@ class KaraokeFile {
     }
 
     return abs(biggestPitch - smallestPitch);
+  }
+
+  // This gets the average pitch height
+  public int getPitchAverage(ArrayList<NoteElement> noteElements) {
+
+    int pitches = 0;
+
+    for(NoteElement e : noteElements) {
+      pitches += e.getPitch();
+    }
+
+    return (int)(pitches / noteElements.size());
+  }
+
+  public int getPitchRange() {
+    return getPitchRange(this.noteElements);
   }
 
   private String getLatestSyllable() {
