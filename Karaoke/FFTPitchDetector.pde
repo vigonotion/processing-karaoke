@@ -15,11 +15,14 @@ public class FFTPitchDetector extends PitchDetector {
     this.audioInput = audioInput;
     this.SAMPLERATE = sampleRate;
 
-    fft = new FFT(audioInput.left.size(), SAMPLERATE);
+    if(this.audioInput != null) fft = new FFT(audioInput.left.size(), SAMPLERATE);
   }
 
   @Override
   public void analyze() {
+
+    // Checks if there is input
+    if(this.audioInput == null) return;
 
     // Use a Fast Fourier Transformation to get the current frequency
 
@@ -40,6 +43,7 @@ public class FFTPitchDetector extends PitchDetector {
   // Override the current Audio Input
   public void setAudioInput(AudioInput audioInput) {
     this.audioInput = audioInput;
+    if(this.audioInput != null) fft = new FFT(audioInput.left.size(), SAMPLERATE);
   }
 
 }

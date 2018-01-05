@@ -1,8 +1,8 @@
 public abstract class GUIElement {
 
-  Karaoke karaoke;
-  PGraphics canvas;
-  int canvasWidth, canvasHeight;
+  protected Karaoke karaoke;
+  protected PGraphics canvas;
+  protected int canvasWidth, canvasHeight;
 
   public GUIElement(Karaoke karaoke, int canvasWidth, int canvasHeight) {
     this.karaoke = karaoke;

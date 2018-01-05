@@ -7,6 +7,9 @@ public abstract class PitchDetector {
 
   public PitchDetector(Karaoke karaoke) {
     this.karaoke = karaoke;
+
+    this.frequency = 0;
+    this.volume = 0;
   }
 
   public abstract void analyze();

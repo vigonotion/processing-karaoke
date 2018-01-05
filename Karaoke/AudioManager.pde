@@ -25,6 +25,22 @@ public class AudioManager {
     this.in2 = minim2.getLineIn(Minim.STEREO);
   }
 
+  public void setMixer(int input, int mixer) {
+
+    if(input == 1) {
+      if ( this.in1 != null ) this.in1.close();
+      this.in1 = null;
+      this.minim1.setInputMixer(AudioSystem.getMixer(mixerInfo[mixer]));
+      this.in1 = minim1.getLineIn(Minim.STEREO);
+    } else if(input == 2) {
+      if ( this.in2 != null ) this.in2.close();
+      this.in2 = null;
+      this.minim2.setInputMixer(AudioSystem.getMixer(mixerInfo[mixer]));
+      this.in2 = minim2.getLineIn(Minim.STEREO);
+    }
+
+  }
+
   public AudioInput getAudioInput(int index) {
     if(index == 1) return this.in1;
     if(index == 2) return this.in2;
