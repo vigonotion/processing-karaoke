@@ -117,6 +117,10 @@ public class ScreenSingingGame extends Screen {
     // Or show the Game Screen
     else {
 
+      if (this.movie.time() == this.movie.duration()) { //movie must be finished
+        results();
+      }
+
       // Draw the title
       canvas.textAlign(LEFT);
       canvas.fill(255);
@@ -326,9 +330,17 @@ public class ScreenSingingGame extends Screen {
     canvas.endDraw();
   }
 
+  private void results() {
+    ScreenResults screenResults = new ScreenResults(this.karaoke, this.player1, this.player2, this.isMultiplayer);
+    screenResults.start();
+    this.karaoke.screenManager.setScreen(screenResults);
+    this.stop();
+  }
+
   @Override
   public void stop() {
     this.isRunning = false;
+    this.movie.stop();
   }
 
   @Override
@@ -365,6 +377,12 @@ public class ScreenSingingGame extends Screen {
       }
 
     }
+
+    // Zur Auswertung springen
+    if(keyCode == ENTER && !this.isPaused) {
+      results();
+    }
+
   }
 
 }
