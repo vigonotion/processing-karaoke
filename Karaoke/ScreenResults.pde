@@ -20,20 +20,26 @@ class ScreenResults extends Screen {
     this.player1 = player1;
     this.player2 = player2;
 
-    this.score1 = this.player1.getScore();
-    this.score2 = this.player2.getScore();
+    this.isMultiplayer = isMultiplayer;
 
-    if(this.score1 > this.score2) {
-      this.score2 = map((float)this.score2, 0, (float)this.score1, 0, 1);
-      this.score1 = 1f;
-      this.wonPlayer = 1;
-    } else {
-      this.score1 = map((float)this.score1, 0, (float)this.score2, 0, 1);
-      this.score2 = 1f;
-      this.wonPlayer = 2;
+    this.score1 = this.player1.getScore();
+
+    if(this.isMultiplayer) {
+
+      this.score2 = this.player2.getScore();
+
+      if(this.score1 > this.score2) {
+        this.score2 = map((float)this.score2, 0, (float)this.score1, 0, 1);
+        this.score1 = 1f;
+        this.wonPlayer = 1;
+      } else {
+        this.score1 = map((float)this.score1, 0, (float)this.score2, 0, 1);
+        this.score2 = 1f;
+        this.wonPlayer = 2;
+      }
+
     }
 
-    this.isMultiplayer = isMultiplayer;
 
     this.assets = this.karaoke.getAssets();
 
@@ -47,13 +53,6 @@ class ScreenResults extends Screen {
   @Override
   public void draw() {
     if(!isRunning) return;
-
-    // Calculate current height
-    height1 = lerp(height1, (float)score1, 0.05f);
-    height2 = lerp(height2, (float)score2, 0.05f);
-
-    scoreText1 = lerp((float)scoreText1, (float)this.player1.getScore(), 0.05f);
-    scoreText2 = lerp((float)scoreText2, (float)this.player2.getScore(), 0.05f);
 
     this.canvas.beginDraw();
     this.canvas.clear();
@@ -74,6 +73,13 @@ class ScreenResults extends Screen {
       this.canvas.text("War das eine Runde!", 50, 130);
 
       if(this.isMultiplayer) {
+
+        // Calculate current height
+        height1 = lerp(height1, (float)score1, 0.05f);
+        height2 = lerp(height2, (float)score2, 0.05f);
+
+        scoreText1 = lerp((float)scoreText1, (float)this.player1.getScore(), 0.05f);
+        scoreText2 = lerp((float)scoreText2, (float)this.player2.getScore(), 0.05f);
 
         this.canvas.strokeWeight(0);
 
@@ -105,7 +111,19 @@ class ScreenResults extends Screen {
 
         this.canvas.textFont(assets.font_OpenSans);
         this.canvas.textSize(24);
-        this.canvas.text("Drücke [ENTER] um zum Hauptmenü zurückzukehren.", 2* width/3, height - 350);
+        this.canvas.text("Drücke [ENTER], um zum Hauptmenü zurückzukehren.", 2* width/3, height - 350);
+      } else {
+
+        this.canvas.textFont(assets.font_OpenSans_Bold);
+        this.canvas.textSize(42);
+        this.canvas.textAlign(CENTER);
+        this.canvas.fill(255);
+        this.canvas.text("Gut gemacht!",width/2, 300);
+
+        this.canvas.textFont(assets.font_OpenSans);
+        this.canvas.textSize(24);
+        this.canvas.text("Drücke [ENTER], um zum Hauptmenü zurückzukehren.", width/2, height - 350);
+
       }
 
     this.canvas.endDraw();
