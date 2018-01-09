@@ -14,7 +14,7 @@ boolean gameLoaded = false;
 
 void settings() {
   // Create Settings Manager
-  settingsManager = new SettingsManager("assets/settings.ini");
+  settingsManager = new SettingsManager("data/assets/settings.ini");
 
   // Window Settings, P2D as Renderer (faster)
   if(getSettingsManager().getBooleanSetting("fullScreen")) {
