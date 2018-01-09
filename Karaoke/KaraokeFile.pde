@@ -32,7 +32,7 @@ class KaraokeFile {
 
     this.startTime = 0;
 
-    this.cover = loadImage("assets/unknown.jpg");
+    this.cover = loadImage("assets/unknown.png");
 
     dot = new Dot();
 
