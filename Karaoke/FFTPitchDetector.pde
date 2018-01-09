@@ -15,13 +15,14 @@ public class FFTPitchDetector extends PitchDetector {
     this.audioInput = audioInput;
     this.SAMPLERATE = sampleRate;
 
+    // Prevent a NullPointerException when no AudioInput is specified
     if(this.audioInput != null) fft = new FFT(audioInput.left.size(), SAMPLERATE);
   }
 
   @Override
   public void analyze() {
 
-    // Checks if there is input
+    // Only analyze if there is an AudioInput
     if(this.audioInput == null) return;
 
     // Use a Fast Fourier Transformation to get the current frequency
@@ -29,7 +30,7 @@ public class FFTPitchDetector extends PitchDetector {
     // Analyze the spectrum
     fft.forward(audioInput.mix);
 
-    // Get the band with highest frequency
+    // Get the band with highest frequency and its volume
     this.frequency = 0;
     this.volume = 0;
     for(int i = 0; i < SAMPLERATE/2; i++) {

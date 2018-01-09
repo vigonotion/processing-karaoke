@@ -25,6 +25,8 @@ class KaraokeFile {
 
     this.rawFile = new File(file);
 
+    // Instanciate Settings with some placeholders if they are undefined
+
     this.artist = "Unknown Artist";
     this.title = "Unknown Title";
 
@@ -34,19 +36,24 @@ class KaraokeFile {
 
     dot = new Dot();
 
-
+    // Load the karaoke file
     String[] lines = loadStrings(file);
+
     noteElements = new ArrayList<NoteElement>();
     noteRows = new ArrayList<NoteRow>();
 
+    // loop through every line of the karaoke file
     for (int i = 0 ; i < lines.length; i++) {
       if(lines[i] == null || lines[i].charAt(0) == 'E') continue;
 
+      // Settings are declared with a '#' and their value is delimited by ':'
       if(lines[i].charAt(0) == '#') {
 
         String[] kv = split(lines[i], ':');
         String key = kv[0];
         String value = kv[1];
+
+        // Store recognized settings
 
         if(key.equals("#BPM")) bpm = Float.valueOf(value.replace(",", "."));
         if(key.equals("#GAP")) gap = Integer.valueOf(value);
@@ -65,8 +72,11 @@ class KaraokeFile {
         }
 
       } else {
+        // Otherwise the current row is a NoteElement
+
         String[] elements = splitCommands(lines[i]);
 
+        // Determine its type ...
         int noteType = NoteElement.NOTE_TYPE_REGULAR;
 
         switch(elements[0].charAt(0)) {
@@ -85,42 +95,43 @@ class KaraokeFile {
 
         }
 
-          NoteElement noteElement = new NoteElement(noteType, Integer.valueOf(elements[1]), Integer.valueOf(elements[2]), Integer.valueOf(elements[3]), elements[4]);
-          noteElements.add(noteElement);
-          //print(elements[1] + "|" + elements[2] + "|" + elements[3] + "|" + elements[4] + "\n");
+        // ... and store them in the ArrayList
+        NoteElement noteElement = new NoteElement(noteType, Integer.valueOf(elements[1]), Integer.valueOf(elements[2]), Integer.valueOf(elements[3]), elements[4]);
+        noteElements.add(noteElement);
 
       }
     }
 
+    // Prepare Note Rows
     ArrayList<NoteElement> noteRowElements = new ArrayList<NoteElement>();
 
+    // Go through every NoteElement ...
     for(NoteElement i : noteElements) {
 
       if(i.getNoteType() == NoteElement.NOTE_TYPE_LINEBREAK) {
-        //println();
-
+        // ... if there is a linebreak, store every note element since the last linebreak in a NoteRow
+        // and add them to the ArrayList
         noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone(), i.getPosition()));
+
+        // Clear the list for the next lines
         noteRowElements = new ArrayList<NoteElement>();
 
       } else {
-        //print(i.getSyllable());
-        //println((new NoteRow((ArrayList<NoteElement>)noteRowElements.clone())).getLine());
+        // ... if it's an actual note, add it to the current NoteRow
         noteRowElements.add(i);
-
       }
 
     }
 
+    // Store the last row (because there is no linebreak in the end)
     noteRows.add(new NoteRow((ArrayList<NoteElement>)noteRowElements.clone(), 0));
-    noteRowElements = new ArrayList<NoteElement>();
 
-    for(NoteRow r : noteRows) {
-      //println(r.getLine());
-    }
+    // Clear the list
+    noteRowElements = null;
 
   }
 
-
+  // This splits a line from a karaoke file into its parts
   public String[] splitCommands(String command) {
     char cmd[] = command.toCharArray();
     String r[] = {"", "", "", "", ""};
@@ -147,24 +158,28 @@ class KaraokeFile {
 
   }
 
+  // The KaraokeFile time depends on the movie time, so you have to set a movie here
   public void play(Movie movie) {
     this.movie = movie;
+
+    // If there is a setting to start at another point in the song, jump to it
     if(this.startTime > 0) {
       this.movie.pause();
       this.movie.jump(this.startTime);
       this.movie.play();
     }
+
   }
 
-  int lastRow = 0;
-
   public void update() {
+    // Calculate the elapsed time based on the movie time
     long elapsed = (long) (movie.time() * 1000) - gap;
 
-    // You have to multiply the beats by 4 because they use quarter beats
+    // You have to multiply the beats by 4 because they use quarter beats in the karaoke files
     currentBeatDouble = (((double) ((double)bpm * 4 / 60000) * (double) elapsed));
     currentBeat = (int) (currentBeatDouble);
 
+    // Update the dot
     dot.update();
 
   }
@@ -242,10 +257,12 @@ class KaraokeFile {
 
   }
 
+  // Returns true if NoteElement e is the NoteElement which you should sing at this moment
   private boolean singing(NoteElement e) {
     return (currentBeatDouble > e.position && !sung(e));
   }
 
+  // Returns true if the NoteElement is already been sung
   private boolean sung(NoteElement e) {
     return (currentBeatDouble > e.position + e.duration);
   }
@@ -256,6 +273,7 @@ class KaraokeFile {
     return (e != null && !sung(e) && singing(e) && e.noteType != NoteElement.NOTE_TYPE_LINEBREAK);
   }
 
+  // Returns the current syllable to be sung
   private String getLatestSyllable(boolean offset) {
 
     NoteElement biggestEl = getLatestNoteElement(offset);

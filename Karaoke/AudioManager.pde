@@ -21,10 +21,12 @@ public class AudioManager {
     this.minim1.setInputMixer(AudioSystem.getMixer(mixerInfo[this.karaoke.getSettingsManager().getIntegerSetting("mixer1")]));
     this.minim2.setInputMixer(AudioSystem.getMixer(mixerInfo[this.karaoke.getSettingsManager().getIntegerSetting("mixer2")]));
 
+    // Get the lines from the previous created Minim Objects
     this.in1 = minim1.getLineIn(Minim.STEREO);
     this.in2 = minim2.getLineIn(Minim.STEREO);
   }
 
+  // This overrides a mixer with an input
   public void setMixer(int input, int mixer) {
 
     if(input == 1) {
@@ -45,6 +47,7 @@ public class AudioManager {
 
   }
 
+  // Gets the current AudioInput
   public AudioInput getAudioInput(int index) {
     if(index == 1) return this.in1;
     if(index == 2) return this.in2;

@@ -3,13 +3,11 @@ private SettingsManager settingsManager;
 private AudioManager audioManager;
 
 private ScreenManager screenManager;
-private ScreenSingingGame screenSingingGame;
 
-private ScreenLoadGame loadScreen;
-private ScreenMainMenu mainMenu;
-private ScreenSettings settingsScreen;
-
-boolean gameLoaded = false;
+// Declare Screens which should be only instanciated once
+public ScreenLoadGame loadScreen;
+public ScreenMainMenu mainMenu;
+public ScreenSettings settingsScreen;
 
 
 void settings() {
@@ -40,21 +38,22 @@ void setup() {
   // Create Screen Manager
   screenManager = new ScreenManager(this);
 
-
+  // Instanciate Screens
   loadScreen = new ScreenLoadGame(this);
   mainMenu = new ScreenMainMenu(this);
   settingsScreen = new ScreenSettings(this);
 
+  // Set the current screen to Main Menu
   screenManager.setScreen(mainMenu);
 
 }
 
 void draw() {
+
+  // This draws the ScreenManager which manages the Screen to be drawn
   screenManager.draw();
   image(screenManager.getScreen(), 0, 0);
 
-  if(gameLoaded) screenManager.setScreen(screenSingingGame);
-  gameLoaded = false;
 }
 
 // Allow other classes to use main assets
@@ -62,13 +61,18 @@ public Assets getAssets() {
   return this.assets;
 }
 
+// Allow other classes to use settings manager
 public SettingsManager getSettingsManager() {
   return this.settingsManager;
 }
 
+// Allow other classes to use audio manager
 public AudioManager getAudioManager() {
   return this.audioManager;
 }
+
+
+// Let the ScreenManager handle Input Events
 
 void keyPressed() {
   screenManager.keyPressed();

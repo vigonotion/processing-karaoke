@@ -23,12 +23,14 @@ class ScreenSplashScreen extends Screen {
   public void draw() {
     if(!isRunning) return;
 
-    canvas.beginDraw();
-    canvas.clear();
+    this.canvas.beginDraw();
+    this.canvas.clear();
 
-    canvas.background(0);
-    canvas.image(assets.image_Splash, width/2 - this.splashSize/2, height/2 - this.splashSize/2, this.splashSize, this.splashSize);
-    canvas.endDraw();
+      // Draw a Splash Image
+      this.canvas.background(0);
+      this.canvas.image(assets.image_Splash, width/2 - this.splashSize/2, height/2 - this.splashSize/2, this.splashSize, this.splashSize);
+
+    this.canvas.endDraw();
   }
 
   @Override

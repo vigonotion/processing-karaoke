@@ -1,5 +1,9 @@
 class NoteElement {
 
+  /**
+   * Store a note element with all its settings
+   */
+
   private static final int NOTE_TYPE_REGULAR = 0;
   private static final int NOTE_TYPE_GOLDEN = 1;
   private static final int NOTE_TYPE_FREESTYLE = 2;

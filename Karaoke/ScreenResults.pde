@@ -24,10 +24,12 @@ class ScreenResults extends Screen {
 
     this.score1 = this.player1.getScore();
 
+    // Do this part only if there are two players
     if(this.isMultiplayer) {
 
       this.score2 = this.player2.getScore();
 
+      // This sets the higher score to one and the lower one in relation (0 to 1)
       if(this.score1 > this.score2) {
         this.score2 = map((float)this.score2, 0, (float)this.score1, 0, 1);
         this.score1 = 1f;
@@ -39,7 +41,6 @@ class ScreenResults extends Screen {
       }
 
     }
-
 
     this.assets = this.karaoke.getAssets();
 
@@ -69,47 +70,48 @@ class ScreenResults extends Screen {
       // Draw the subtitle
       this.canvas.textFont(assets.font_QuickSand);
       this.canvas.textSize(30);
-      // @TODO: randomize
+      
       this.canvas.text("War das eine Runde!", 50, 130);
 
       if(this.isMultiplayer) {
 
         // Calculate current height
-        height1 = lerp(height1, (float)score1, 0.05f);
-        height2 = lerp(height2, (float)score2, 0.05f);
+        this.height1 = lerp(this.height1, (float)this.score1, 0.05f);
+        this.height2 = lerp(this.height2, (float)this.score2, 0.05f);
 
-        scoreText1 = lerp((float)scoreText1, (float)this.player1.getScore(), 0.05f);
-        scoreText2 = lerp((float)scoreText2, (float)this.player2.getScore(), 0.05f);
+        // Calculate current score
+        this.scoreText1 = lerp((float)this.scoreText1, (float)this.player1.getScore(), 0.05f);
+        this.scoreText2 = lerp((float)this.scoreText2, (float)this.player2.getScore(), 0.05f);
 
         this.canvas.strokeWeight(0);
 
-        this.canvas.fill(player1.getNoteColor());
+        this.canvas.fill(this.player1.getNoteColor());
         this.canvas.rect(50,height,BAR_WIDTH,(float)( -(height - BAR_MAX)* this.height1));
 
-        this.canvas.textFont(assets.font_OpenSans);
+        this.canvas.textFont(this.assets.font_OpenSans);
         this.canvas.textSize(24);
         this.canvas.fill(255);
-        this.canvas.text((int)(scoreText1), 50, (float) (height - this.height1 * (height - BAR_MAX)) - 20);
+        this.canvas.text((int)(this.scoreText1), 50, (float) (height - this.height1 * (height - BAR_MAX)) - 20);
 
-        this.canvas.fill(player2.getNoteColor());
+        this.canvas.fill(this.player2.getNoteColor());
         this.canvas.rect(50 + BAR_WIDTH + BAR_GAP,height,BAR_WIDTH,(float) (- (height - BAR_MAX) * this.height2));
 
-        this.canvas.textFont(assets.font_OpenSans);
+        this.canvas.textFont(this.assets.font_OpenSans);
         this.canvas.textSize(24);
         this.canvas.fill(255);
-        this.canvas.text((int)(scoreText2), 50 + BAR_WIDTH + BAR_GAP, (float) (height - this.height2 * (height - BAR_MAX)) - 20);
+        this.canvas.text((int)(this.scoreText2), 50 + BAR_WIDTH + BAR_GAP, (float) (height - this.height2 * (height - BAR_MAX)) - 20);
 
 
-        this.canvas.textFont(assets.font_OpenSans);
+        this.canvas.textFont(this.assets.font_OpenSans);
         this.canvas.textSize(42);
         this.canvas.textAlign(CENTER);
         this.canvas.fill(255);
         this.canvas.text("Herzlichen Glückwunsch,", 2* width/3, 300);
 
-        this.canvas.textFont(assets.font_OpenSans_Bold);
-        this.canvas.text("Spieler " + wonPlayer + "!", 2* width/3, 350);
+        this.canvas.textFont(this.assets.font_OpenSans_Bold);
+        this.canvas.text("Spieler " + this.wonPlayer + "!", 2* width/3, 350);
 
-        this.canvas.textFont(assets.font_OpenSans);
+        this.canvas.textFont(this.assets.font_OpenSans);
         this.canvas.textSize(24);
         this.canvas.text("Drücke [ENTER], um zum Hauptmenü zurückzukehren.", 2* width/3, height - 350);
       } else {
@@ -134,18 +136,17 @@ class ScreenResults extends Screen {
     this.isRunning = false;
   }
 
+  @Override
+  public void keyPressed() {
 
-    @Override
-    public void keyPressed() {
-
-      // Exit to Main Menu
-      if (keyCode == 27 || keyCode == TAB || keyCode == ENTER) {
-        key = 0;
-        this.karaoke.mainMenu.start();
-        this.karaoke.screenManager.setScreen(this.karaoke.mainMenu);
-        this.stop();
-      }
-
+    // Exit to Main Menu
+    if (keyCode == 27 || keyCode == TAB || keyCode == ENTER) {
+      key = 0;
+      this.karaoke.mainMenu.start();
+      this.karaoke.screenManager.setScreen(this.karaoke.mainMenu);
+      this.stop();
     }
+
+  }
 
 }

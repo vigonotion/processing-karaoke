@@ -9,13 +9,18 @@ class NoteRow {
   public NoteRow(ArrayList<NoteElement> noteElements, int endBeat) {
     this.noteElements = noteElements;
 
+    // Set the endBeat, and if it isn't defined (0) it will be calculated
+    // --> The last beat is equal to the position of the last note element in the row plus its duration
     if(endBeat > 0)
       this.endBeat = endBeat;
     else this.endBeat = noteElements.get(noteElements.size()-1).getPosition() + noteElements.get(noteElements.size()-1).getDuration();
 
     this.line = "";
+
+    // The first beat is the position of the first note in the list
     this.firstBeat = noteElements.get(0).getPosition();
 
+    // Concatenate the current line by adding all syllables of this row
     for(NoteElement el : noteElements) {
       this.line += el.getSyllable();
       if(el.getPosition() < this.firstBeat) this.firstBeat = el.getPosition();

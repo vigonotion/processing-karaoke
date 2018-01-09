@@ -25,15 +25,19 @@ public class Player {
     return this.detector;
   }
 
+  // Calculates the offset from the input to the real note
   public float getOffset(int currentNote, float frequency) {
 
+    // Get the normalized midi of this note (eliminate octaves: c' = c'' = c and so on)
     int currentMidiNormalized = (int)(detector.normalizeMidi(currentNote));
 
+    // Do the same with the sung midi
     float sungMidiNormalized = detector.frequencyToNormalizedMidi(frequency);
 
+    // Calculate the offset in three ways (because 12 is nearer to 1 than to 7...)...
     float offsetRaw[] = { (currentMidiNormalized-12 - sungMidiNormalized), (currentMidiNormalized - sungMidiNormalized), (currentMidiNormalized+12 - sungMidiNormalized) };
 
-    // Add a circular offset (because 12 is nearer to 1 than to 7...)
+    // ... to get the lowest absolute offset
     float offset = 0;
     if(abs(offsetRaw[0]) <= 5.5) offset = offsetRaw[0];
     else if(abs(offsetRaw[1]) <= 5.5) offset = offsetRaw[1];
@@ -50,6 +54,9 @@ public class Player {
 
     double score = 0;
 
+    // Each sung note gives points
+    // Perfectly sung: 12 points
+    // Offset of 4 or more: 0 points
     for(SungNoteElement e : this.notesSung) {
       score += map(constrain(abs(e.getOffset()), 0, 4), 0, 4, 12, 0);
     }

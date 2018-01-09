@@ -3,8 +3,6 @@ public class ScreenManager extends Screen {
   Screen currentScreen;
   Screen nextScreen;
 
-  // @TODO: Add Animator
-
   public ScreenManager(Karaoke karaoke) {
     super(karaoke);
   }
@@ -22,34 +20,38 @@ public class ScreenManager extends Screen {
   @Override
   public void draw() {
 
-    if(currentScreen != null && currentScreen.isRunning) {
-      canvas.beginDraw();
-      canvas.clear();
-      currentScreen.draw();
-      canvas.image(currentScreen.getScreen(), 0, 0);
-      canvas.endDraw();
+    // Draw the current screen
+
+    if(this.currentScreen != null && this.currentScreen.isRunning) {
+      this.canvas.beginDraw();
+      this.canvas.clear();
+
+        this.currentScreen.draw();
+        this.canvas.image(this.currentScreen.getScreen(), 0, 0);
+        
+      this.canvas.endDraw();
     }
 
   }
 
   public void keyPressed() {
-    if(currentScreen != null && currentScreen.isRunning)
-    currentScreen.keyPressed();
+    if(this.currentScreen != null && this.currentScreen.isRunning)
+    this.currentScreen.keyPressed();
   }
 
   public void keyReleased() {
-    if(currentScreen != null && currentScreen.isRunning)
-    currentScreen.keyReleased();
+    if(this.currentScreen != null && this.currentScreen.isRunning)
+    this.currentScreen.keyReleased();
   }
 
   public void mousePressed() {
-    if(currentScreen != null && currentScreen.isRunning)
-    currentScreen.mousePressed();
+    if(this.currentScreen != null && this.currentScreen.isRunning)
+    this.currentScreen.mousePressed();
   }
 
   public void mouseReleased() {
-    if(currentScreen != null && currentScreen.isRunning)
-    currentScreen.mouseReleased();
+    if(this.currentScreen != null && this.currentScreen.isRunning)
+    this.currentScreen.mouseReleased();
   }
 
   @Override

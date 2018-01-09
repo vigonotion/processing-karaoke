@@ -1,5 +1,11 @@
 public class MicInputItem extends GUIElement {
 
+  /**
+   * This is a class which draws a Box with Text to draw the Settings Item
+   * to select the Microphone input
+   */
+
+
   public static final int STATE_UNAVAILABLE = -2;
   public static final int STATE_ERROR = -1;
   public static final int STATE_IDLE = 0;
@@ -31,6 +37,7 @@ public class MicInputItem extends GUIElement {
     this.canvas.beginDraw();
     this.canvas.clear();
 
+      // Draw the box background based on the state
       this.canvas.strokeWeight(0);
       this.canvas.fill(25);
       if(this.state == STATE_AVAILABLE) this.canvas.fill( 0, 128, 0 );
@@ -38,6 +45,8 @@ public class MicInputItem extends GUIElement {
       else if(this.state == STATE_UNAVAILABLE) this.canvas.fill(25);
       this.canvas.rect(0, 0, this.canvasWidth, this.canvasHeight);
 
+      // Draw the text based on the state
+      // (should be grey if the other input uses this input)
       this.canvas.textFont(assets.font_OpenSans);
       this.canvas.textSize(24);
       this.canvas.strokeWeight(0);

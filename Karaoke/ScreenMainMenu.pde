@@ -29,55 +29,52 @@ class ScreenMainMenu extends Screen {
   public void draw() {
     if(!isRunning) return;
 
-    canvas.beginDraw();
-    canvas.clear();
-    canvas.background(0);
+    this.canvas.beginDraw();
+    this.canvas.clear();
+    this.canvas.background(0);
 
     // Draw the title
-    canvas.fill(255);
-    canvas.textFont(assets.font_QuickSand_Bold);
-    canvas.textSize(42);
-    canvas.text("Hauptmenü", 50, 90);
+    this.canvas.fill(255);
+    this.canvas.textFont(assets.font_QuickSand_Bold);
+    this.canvas.textSize(42);
+    this.canvas.text("Hauptmenü", 50, 90);
 
     // Draw the subtitle
-    canvas.textFont(assets.font_QuickSand);
-    canvas.textSize(30);
-    canvas.text("Bitte wähle einen Song", 50, 130);
+    this.canvas.textFont(assets.font_QuickSand);
+    this.canvas.textSize(30);
+    this.canvas.text("Bitte wähle einen Song", 50, 130);
 
     // Draw the files
     int item = 0;
     for(KaraokeFile k : karaokeFiles) {
 
-      // Background Rect
-      // canvas.rect(50, height/2 -300, 1300, 700, 5);
-
-      canvas.strokeWeight(2);
-      canvas.noFill();
-      canvas.stroke(255);
+      this.canvas.strokeWeight(2);
+      this.canvas.noFill();
+      this.canvas.stroke(255);
 
       int coverX = width/2 - COVER_SIZE/2 + COVER_GAP * (item-selectedSong);
 
       if(item == selectedSong) {
         coverX = width/2 - COVER_SIZE_SELECTED/2;
 
-        canvas.rect(coverX -2, height/2 - COVER_SIZE_SELECTED/2-2, COVER_SIZE_SELECTED+4, COVER_SIZE_SELECTED+4, 5);
-        canvas.image(k.getCover(), coverX, height/2 - COVER_SIZE_SELECTED/2, COVER_SIZE_SELECTED, COVER_SIZE_SELECTED);
+        this.canvas.rect(coverX -2, height/2 - COVER_SIZE_SELECTED/2-2, COVER_SIZE_SELECTED+4, COVER_SIZE_SELECTED+4, 5);
+        this.canvas.image(k.getCover(), coverX, height/2 - COVER_SIZE_SELECTED/2, COVER_SIZE_SELECTED, COVER_SIZE_SELECTED);
 
-        canvas.textFont(assets.font_OpenSans_Bold);
-        canvas.textSize(30);
-        canvas.text(k.getTitle(), coverX, height/2 + COVER_SIZE_SELECTED/2 + 60);
+        this.canvas.textFont(assets.font_OpenSans_Bold);
+        this.canvas.textSize(30);
+        this.canvas.text(k.getTitle(), coverX, height/2 + COVER_SIZE_SELECTED/2 + 60);
 
-        canvas.textFont(assets.font_OpenSans);
-        canvas.textSize(30);
-        canvas.text(k.getArtist(), coverX, height/2 + COVER_SIZE_SELECTED/2 + 100);
+        this.canvas.textFont(assets.font_OpenSans);
+        this.canvas.textSize(30);
+        this.canvas.text(k.getArtist(), coverX, height/2 + COVER_SIZE_SELECTED/2 + 100);
       } else {
-        canvas.image(k.getCover(), coverX, height/2 - COVER_SIZE/2, COVER_SIZE, COVER_SIZE);
+        this.canvas.image(k.getCover(), coverX, height/2 - COVER_SIZE/2, COVER_SIZE, COVER_SIZE);
       }
 
       item++;
     }
 
-    canvas.endDraw();
+    this.canvas.endDraw();
   }
 
   private void listSongs() {
@@ -109,8 +106,9 @@ class ScreenMainMenu extends Screen {
     }
   }
 
+  // Loads a song and start the ScreenSingingGame
+  // This uses a Thread to show the Loading Screen as long as the ScreenSingingGame is loading
   private void loadSong() {
-    //this.karaoke.loadGameThread(karaokeFiles.get(selectedSong));
     new Thread(){
       public void run(){
 
@@ -125,9 +123,9 @@ class ScreenMainMenu extends Screen {
 
       }
     }.start();
-
   }
 
+  // Opens the Settings Menu
   private void openSettings() {
     this.karaoke.settingsScreen.start();
     this.karaoke.screenManager.setScreen(this.karaoke.settingsScreen);

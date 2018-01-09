@@ -28,6 +28,7 @@ class ScreenSettings extends Screen {
     this.detector1 = new FFTPitchDetector(this.karaoke, this.karaoke.getAudioManager().getAudioInput(1), 44100, 2048);
     this.detector2 = new FFTPitchDetector(this.karaoke, this.karaoke.getAudioManager().getAudioInput(2), 44100, 2048);
 
+    // Reads the volume values from settings and set the slider position accordingly
     this.sliderPosition = new float[]{
       constrain(map((float) this.karaoke.getSettingsManager().getDoubleSetting("volume1"), (float) 0, (float) 50, (float) 0, (float) 1),0,1),
       constrain(map((float) this.karaoke.getSettingsManager().getDoubleSetting("volume2"), (float) 0, (float) 50, (float) 0, (float) 1),0,1)
@@ -40,9 +41,11 @@ class ScreenSettings extends Screen {
     this.items[0] = new ArrayList<MicInputItem>();
     this.items[1] = new ArrayList<MicInputItem>();
 
+    // Add two empty inputs to be able to switch inputs from one Player to another
     this.items[0].add(new MicInputItem(this.karaoke, "Unbelegt", 0));
     this.items[1].add(new MicInputItem(this.karaoke, "Unbelegt", 0));
 
+    // Add inputs to a list
     for(int i = 0; i < mixerInfo.length; i++) {
       String label = mixerInfo[i].getName();
       String llabel = label.toLowerCase();
@@ -71,47 +74,47 @@ class ScreenSettings extends Screen {
     this.canvas.clear();
     this.canvas.background(0);
 
-    // Draw the title
-    this.canvas.fill(255);
-    this.canvas.textFont(assets.font_QuickSand_Bold);
-    this.canvas.textSize(42);
-    this.canvas.text("Einstellungen", 50, 90);
+      // Draw the title
+      this.canvas.fill(255);
+      this.canvas.textFont(assets.font_QuickSand_Bold);
+      this.canvas.textSize(42);
+      this.canvas.text("Einstellungen", 50, 90);
 
-    // Draw the subtitle
-    this.canvas.textFont(assets.font_QuickSand);
-    this.canvas.textSize(30);
-    this.canvas.text("« Zurück zum Hauptmenü", 50, 130);
+      // Draw the subtitle
+      this.canvas.textFont(assets.font_QuickSand);
+      this.canvas.textSize(30);
+      this.canvas.text("« Zurück zum Hauptmenü", 50, 130);
 
-    // Draw the settings
-    // Multiplayer Checkbox
-    this.canvas.strokeWeight(2);
-    this.canvas.stroke(255);
-    if(this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")) this.canvas.fill(255);
-    else this.canvas.noFill();
-
-    this.canvas.rect(50, 250, CHECKBOX_WIDTH, CHECKBOX_WIDTH);
-
-    this.canvas.textFont(assets.font_OpenSans);
-    this.canvas.textSize(24);
-    this.canvas.strokeWeight(0);
-
-    this.canvas.fill(255);
-    this.canvas.textAlign(LEFT);
-    this.canvas.text("Mehrspieler", 50 + CHECKBOX_WIDTH + 20, 250 + CHECKBOX_WIDTH - 6);
-
-    if(this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")) {
-      this.canvas.noFill();
+      // Draw the settings
+      // Multiplayer Checkbox
       this.canvas.strokeWeight(2);
-      this.canvas.stroke(0);
+      this.canvas.stroke(255);
+      if(this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")) this.canvas.fill(255);
+      else this.canvas.noFill();
 
-      this.canvas.line(50 + 2, 250 + 2, 50 + CHECKBOX_WIDTH - 2, 250 + CHECKBOX_WIDTH - 2);
-      this.canvas.line(50 + CHECKBOX_WIDTH - 2, 250 + 2, 50 + 2, 250 + CHECKBOX_WIDTH - 2);
-    }
+      this.canvas.rect(50, 250, CHECKBOX_WIDTH, CHECKBOX_WIDTH);
+
+      this.canvas.textFont(assets.font_OpenSans);
+      this.canvas.textSize(24);
+      this.canvas.strokeWeight(0);
+
+      this.canvas.fill(255);
+      this.canvas.textAlign(LEFT);
+      this.canvas.text("Mehrspieler", 50 + CHECKBOX_WIDTH + 20, 250 + CHECKBOX_WIDTH - 6);
+
+      if(this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")) {
+        this.canvas.noFill();
+        this.canvas.strokeWeight(2);
+        this.canvas.stroke(0);
+
+        this.canvas.line(50 + 2, 250 + 2, 50 + CHECKBOX_WIDTH - 2, 250 + CHECKBOX_WIDTH - 2);
+        this.canvas.line(50 + CHECKBOX_WIDTH - 2, 250 + 2, 50 + 2, 250 + CHECKBOX_WIDTH - 2);
+      }
 
 
-
-    drawMicSettings(1);
-    drawMicSettings(2);
+      // Draw the Microphone settings
+      drawMicSettings(1);
+      drawMicSettings(2);
 
     this.canvas.endDraw();
 
@@ -213,6 +216,7 @@ class ScreenSettings extends Screen {
 
     mouseClicked = true;
 
+    // Update the Multiplayer Checkbox
     if( ( mouseX >= 50 && mouseX <= 50 + CHECKBOX_WIDTH && mouseY >= 250 && mouseY <= 250 + CHECKBOX_WIDTH )) {
       this.karaoke.getSettingsManager().set("multiplayer", Boolean.toString(!this.karaoke.getSettingsManager().getBooleanSetting("multiplayer")));
     }

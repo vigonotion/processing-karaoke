@@ -13,7 +13,7 @@ public class SettingsManager {
 
     this.settings = new HashMap<String, String>();
 
-    // Load Settings to HashMap
+    // Load Settings from file to HashMap
     for (int i = 0 ; i < lines.length; i++) {
       if(lines[i] == null ||
         lines[i] == "" ||
@@ -28,7 +28,7 @@ public class SettingsManager {
   }
 
   public void save() {
-    // Load Settings to HashMap
+    // Store settings in the file
     for (int i = 0 ; i < lines.length; i++) {
       if(lines[i] == null ||
         lines[i] == "" ||

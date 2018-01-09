@@ -17,22 +17,27 @@ class ScreenLoadGame extends Screen {
   public void draw() {
     if(!isRunning) return;
 
-    canvas.beginDraw();
-    canvas.clear();
-    canvas.background(0);
+    this.canvas.beginDraw();
+    this.canvas.clear();
 
-    canvas.noFill();
-    canvas.strokeWeight(10);
-    canvas.stroke(255);
-    canvas.ellipseMode(CORNER);
-    canvas.arc(width/2-100, height/2-100, 200, 200, 0 + millis()*0.004f, HALF_PI + millis()*0.004f);
+      this.canvas.background(0);
 
-    canvas.textAlign(CENTER);
-    canvas.textFont(assets.font_OpenSans);
-    canvas.textSize(30);
-    canvas.text("Lädt...", width/2, height/2 + 200);
+      this.canvas.noFill();
+      this.canvas.strokeWeight(10);
+      this.canvas.stroke(255);
+      this.canvas.ellipseMode(CORNER);
 
-    canvas.endDraw();
+      // Draw half of a circle and rotate it based on time
+      this.canvas.arc(width/2-100, height/2-100, 200, 200, 0 + millis()*0.004f, HALF_PI + millis()*0.004f);
+
+      this.canvas.textAlign(CENTER);
+      this.canvas.textFont(assets.font_OpenSans);
+      this.canvas.textSize(30);
+
+      // Draw a String
+      this.canvas.text("Lädt...", width/2, height/2 + 200);
+
+    this.canvas.endDraw();
   }
 
   @Override
